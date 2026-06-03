@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config/keys");
 
-module.exports = async function (req, res, next) {
+const auth = async function (req, res, next) {
   const tok = req.cookies?.token;
 
   if (!tok) {
@@ -20,3 +20,18 @@ module.exports = async function (req, res, next) {
     });
   }
 };
+
+auth.optional = async function (req, res, next) {
+  const tok = req.cookies?.token;
+  if (tok) {
+    try {
+      const decoded = jwt.verify(tok, jwtSecret);
+      req.user = decoded;
+    } catch (err) {
+      res.clearCookie("token");
+    }
+  }
+  next();
+};
+
+module.exports = auth;

@@ -1,5 +1,5 @@
 {
-  "name": "login_authentication_authorization",
+  "name": "coinfinex",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {

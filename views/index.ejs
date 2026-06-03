@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Explore — Stock Market</title>
+  <title>Explore — Coinfinex</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -470,8 +470,8 @@
   <nav id="navbar">
     <div class="nav-left">
       <a href="/" class="nav-brand">
-        <div class="nav-brand-icon">SM</div>
-        <span class="nav-brand-text">StockMarket</span>
+        <div class="nav-brand-icon">CF</div>
+        <span class="nav-brand-text">Coinfinex</span>
       </a>
       <div class="nav-tabs">
         <a href="/explore" class="nav-tab active">Explore</a>
@@ -513,12 +513,12 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
 
-      <% if (typeof user !== 'undefined' && user) { %>
-        <a href="/dashboard/<%= encodeURIComponent(user.username) %>" class="tb-user">
+      <% if (typeof user !== 'undefined' && user && (user.username || user.email)) { %>
+        <a href="/dashboard/<%= encodeURIComponent(user.username || user.email) %>" class="tb-user">
           <div class="tb-avatar">
-            <%= (user.username && user.username[0] ? user.username[0].toUpperCase() : 'U') %>
+            <%= (user.username && user.username[0] ? user.username[0].toUpperCase() : (user.email && user.email[0] ? user.email[0].toUpperCase() : 'U')) %>
           </div>
-          <span class="tb-name"><%= user.username %></span>
+          <span class="tb-name"><%= user.username || user.email %></span>
         </a>
         <a href="/logout" class="nav-logout" title="Logout">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>

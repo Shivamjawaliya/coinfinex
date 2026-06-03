@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nexus Sign Up</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #03040a;
+  --neon: #00f5c4;
+  --neon2: #7b61ff;
+  --neon3: #ff6b6b;
+  --text: #f0f0f0;
+  --muted: rgba(240,240,240,0.5);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  height:100vh;
+  background:var(--bg);
+  font-family:'DM Sans', sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  color:var(--text);
+}
+
+/* Aurora Background */
+.aurora {
+  position:fixed;
+  inset:0;
+}
+
+.blob {
+  position:absolute;
+  border-radius:50%;
+  filter:blur(100px);
+  opacity:0.2;
+  animation: float 16s infinite alternate;
+}
+
+.blob:nth-child(1){
+  width:600px;height:600px;
+  background:var(--neon2);
+  top:-150px;left:-100px;
+}
+.blob:nth-child(2){
+  width:500px;height:500px;
+  background:var(--neon);
+  bottom:-150px;right:-120px;
+}
+.blob:nth-child(3){
+  width:400px;height:350px;
+  background:var(--neon3);
+  top:50%;left:30%;
+}
+
+@keyframes float {
+  0%{transform:translate(0,0)}
+  50%{transform:translate(80px,60px)}
+  100%{transform:translate(-40px,40px)}
+}
+
+/* Card */
+.card {
+  position:relative;
+  z-index:1;
+  width:400px;
+  padding:45px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 0 50px rgba(0,245,196,0.15);
+  animation:fadeUp 1s ease;
+}
+
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.card h2 {
+  font-family:'Syne',sans-serif;
+  text-align:center;
+  margin-bottom:30px;
+  font-size:2.2rem;
+}
+
+/* Inputs */
+.input {
+  position:relative;
+  margin-bottom:22px;
+}
+
+.input input {
+  width:100%;
+  padding:12px;
+  background:transparent;
+  border:none;
+  border-bottom:2px solid var(--muted);
+  color:var(--text);
+  outline:none;
+}
+
+.input label {
+  position:absolute;
+  top:12px;
+  left:0;
+  color:var(--muted);
+  transition:0.3s;
+}
+
+.input input:focus + label,
+.input input:valid + label {
+  top:-10px;
+  font-size:12px;
+  color:var(--neon);
+}
+
+/* Button */
+button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+  margin-top:10px;
+}
+
+button:hover {
+  transform:scale(1.05);
+  box-shadow:0 0 30px rgba(0,245,196,0.4);
+}
+
+/* Footer */
+.footer {
+  text-align:center;
+  margin-top:18px;
+  font-size:0.9rem;
+}
+
+.footer a {
+  color:var(--neon);
+  text-decoration:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="aurora">
+  <div class="blob"></div>
+  <div class="blob"></div>
+  <div class="blob"></div>
+</div>
+
+<div class="card">
+  <h2>Create Account</h2>
+
+  <form action="/signup" method="POST">
+    <div class="input">
+      <input type="text" name='name'required>
+      <label>Full Name</label>
+    </div>
+
+    <div class="input">
+      <input type="email" name="email" required>
+      <label>Email</label>
+    </div>
+
+    <div class="input">
+      <input type="password" name="password" required>
+      <label>Password</label>
+    </div>
+
+    <div class="input">
+      <input type="password" name="confirmPassword" required>
+      <label>Confirm Password</label>
+    </div>
+
+    <button type="submit">Sign Up</button>
+
+    <div class="footer">
+      Already have an account? <a href="/login">Login</a>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

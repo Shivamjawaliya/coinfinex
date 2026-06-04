@@ -14,6 +14,9 @@ export const signup = (name: string, email: string, password: string, confirmPas
 export const logout = () => api.get("/auth/logout");
 export const sendOtp = (email: string) => api.post("/auth/send-otp", { email });
 export const verifyOtp = (email: string, otp: string) => api.post("/auth/verify-otp", { email, otp });
+export const forgotPassword = (email: string) => api.post("/auth/forgot-password", { email });
+export const resetPassword = (token: string, email: string, password: string, confirmPassword: string) =>
+  api.post("/auth/reset-password", { token, email, password, confirmPassword });
 
 // Dashboard
 export const getDashboard = () => api.get("/dashboard");

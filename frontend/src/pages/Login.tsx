@@ -225,6 +225,14 @@ export default function Login() {
             <button className="login-btn" type="submit" disabled={loading}>
               {loading ? "Signing in…" : "Login"}
             </button>
+
+            <div style={{ textAlign:"right", marginTop:12 }}>
+              <Link to="/forgot-password" style={{ color:"rgba(240,240,240,0.4)", fontSize:"0.82rem", textDecoration:"none", transition:"color 0.2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color="#00f5c4")}
+                onMouseLeave={e => (e.currentTarget.style.color="rgba(240,240,240,0.4)")}>
+                Forgot password?
+              </Link>
+            </div>
           </form>
 
           <div className="or-divider">or</div>

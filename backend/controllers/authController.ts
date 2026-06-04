@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import User from "../models/userModel";
 import { jwtSecret } from "../config/keys";
 import { setOtp, getOtp, markVerified, isVerified, clearOtp } from "../utils/otpStore";
+import { createResetToken, consumeResetToken } from "../utils/resetStore";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -153,4 +154,80 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 export const logout = (_req: Request, res: Response): void => {
   res.clearCookie("token");
   res.json({ message: "Logged out" });
+};
+
+// POST /api/auth/forgot-password
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body as { email: string };
+
+  const user = await User.findOne({ username: email });
+  // Always respond OK to avoid email enumeration
+  if (!user || !user.password) {
+    res.json({ message: "If that email exists, a reset link has been sent." });
+    return;
+  }
+
+  const token = createResetToken(email);
+  const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+  const html = `
+  <div style="font-family:'DM Sans',sans-serif;background:#03040a;padding:48px 24px;text-align:center;">
+    <div style="max-width:420px;margin:0 auto;background:rgba(255,255,255,0.04);border:1px solid rgba(0,245,196,0.18);border-radius:20px;padding:40px 36px;">
+      <h1 style="font-size:1.6rem;font-weight:800;color:#f0f0f0;margin:0 0 6px;">Coinfinex</h1>
+      <p style="color:rgba(240,240,240,0.5);font-size:0.9rem;margin:0 0 28px;">Password reset</p>
+      <p style="color:rgba(240,240,240,0.7);font-size:0.95rem;margin:0 0 28px;line-height:1.6;">
+        We received a request to reset your password. Click the button below to set a new one.
+      </p>
+      <a href="${resetUrl}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#00f5c4,#7b61ff);color:#000;font-weight:700;font-size:1rem;border-radius:10px;text-decoration:none;margin-bottom:28px;">
+        Reset password
+      </a>
+      <p style="color:rgba(240,240,240,0.4);font-size:0.82rem;margin:0;">
+        This link expires in <strong style="color:rgba(240,240,240,0.6);">1 hour</strong>.<br/>
+        If you didn't request this, you can safely ignore this email.
+      </p>
+    </div>
+  </div>`;
+
+  try {
+    await makeTransporter().sendMail({
+      from: `"Coinfinex" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: "Reset your Coinfinex password",
+      html,
+    });
+  } catch (err) {
+    console.error("Reset email failed:", err);
+  }
+
+  res.json({ message: "If that email exists, a reset link has been sent." });
+};
+
+// POST /api/auth/reset-password
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, email, password, confirmPassword } = req.body as {
+    token: string; email: string; password: string; confirmPassword: string;
+  };
+
+  if (password !== confirmPassword) {
+    res.status(400).json({ message: "Passwords do not match" });
+    return;
+  }
+
+  const storedEmail = consumeResetToken(token);
+  if (!storedEmail || storedEmail !== email) {
+    res.status(400).json({ message: "Reset link is invalid or has expired" });
+    return;
+  }
+
+  const user = await User.findOne({ username: email });
+  if (!user) { res.status(404).json({ message: "User not found" }); return; }
+
+  try {
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("Reset password failed:", err);
+    res.status(500).json({ message: "Failed to reset password" });
+  }
 };

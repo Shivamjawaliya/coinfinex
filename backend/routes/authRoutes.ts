@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { me, login, signup, logout, sendOtp, verifyOtp } from "../controllers/authController";
+import { me, login, signup, logout, sendOtp, verifyOtp, forgotPassword, resetPassword } from "../controllers/authController";
 import passport from "../config/passport";
 import jwt from "jsonwebtoken";
 import { jwtSecret, frontendUrl } from "../config/keys";
@@ -14,6 +14,8 @@ router.post("/signup", signup);
 router.get("/logout", logout);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtp);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 router.get(
   "/google",

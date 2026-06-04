@@ -5,6 +5,8 @@ import passport from "../config/passport";
 import jwt from "jsonwebtoken";
 import { jwtSecret, frontendUrl } from "../config/keys";
 import type { IUser } from "../models/userModel";
+import User from "../models/userModel";
+import { createAuthCode, consumeAuthCode } from "../utils/authCodeStore";
 
 const router = Router();
 
@@ -30,15 +32,25 @@ router.get(
   }),
   (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const token = jwt.sign({ email: user.username }, jwtSecret);
-    const isProd = process.env.NODE_ENV === "production";
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: isProd ? "none" : "lax",
-      secure: isProd,
-    });
-    res.redirect(`${frontendUrl}/explore`);
+    const code = createAuthCode(user.username as string);
+    res.redirect(`${frontendUrl}/auth/callback?code=${code}`);
   }
 );
+
+router.get("/exchange", async (req: Request, res: Response): Promise<void> => {
+  const { code } = req.query as { code: string };
+  const email = consumeAuthCode(code);
+  if (!email) { res.status(400).json({ message: "Invalid or expired code" }); return; }
+  const user = await User.findOne({ username: email }).select("-password");
+  if (!user) { res.status(404).json({ message: "User not found" }); return; }
+  const token = jwt.sign({ email }, jwtSecret);
+  const isProd = process.env.NODE_ENV === "production";
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+  });
+  res.json({ user });
+});
 
 export default router;

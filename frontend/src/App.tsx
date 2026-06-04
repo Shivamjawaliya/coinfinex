@@ -11,6 +11,7 @@ import Portfolio from "./pages/Portfolio";
 import News from "./pages/News";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AuthCallback from "./pages/AuthCallback";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -26,6 +27,7 @@ function AppRoutes() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/explore" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/dashboard" element={<Navigate to="/explore" replace />} />
       <Route path="/categories" element={<PrivateRoute><Categories /></PrivateRoute>} />

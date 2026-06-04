@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signup as apiSignup, sendOtp as apiSendOtp, verifyOtp as apiVerifyOtp } from "../services/api";
+import { signup as apiSignup, sendOtp as apiSendOtp, verifyOtp as apiVerifyOtp, API_BASE } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 const RESEND_SECS = 30;
@@ -266,7 +266,7 @@ export default function Signup() {
               </form>
 
               <div className="or-divider">or</div>
-              <button className="google-btn" type="button" onClick={() => { window.location.href = "http://localhost:5001/api/auth/google"; }}>
+              <button className="google-btn" type="button" onClick={() => { window.location.href = `${API_BASE}/api/auth/google`; }}>
                 <svg width="18" height="18" viewBox="0 0 48 48">
                   <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.46 3.08 29.5 1 24 1 14.82 1 7.07 6.48 3.66 14.26l7.08 5.5C12.43 13.68 17.73 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.5 24.5c0-1.64-.15-3.22-.42-4.75H24v9h12.68c-.55 2.96-2.2 5.47-4.68 7.15l7.2 5.59C43.18 37.45 46.5 31.44 46.5 24.5z"/>

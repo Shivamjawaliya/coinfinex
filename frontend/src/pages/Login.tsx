@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login as apiLogin } from "../services/api";
+import { login as apiLogin, API_BASE } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -240,7 +240,7 @@ export default function Login() {
           <button
             className="google-btn"
             type="button"
-            onClick={() => { window.location.href = "http://localhost:5001/api/auth/google"; }}
+            onClick={() => { window.location.href = `${API_BASE}/api/auth/google`; }}
           >
             <svg width="18" height="18" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.46 3.08 29.5 1 24 1 14.82 1 7.07 6.48 3.66 14.26l7.08 5.5C12.43 13.68 17.73 9.5 24 9.5z"/>

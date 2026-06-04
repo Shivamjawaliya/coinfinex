@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dns from "dns";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import User from "../models/userModel";
 import { jwtSecret } from "../config/keys";
 import { setOtp, getOtp, markVerified, isVerified, clearOtp } from "../utils/otpStore";
@@ -16,16 +16,17 @@ const cookieOptions = {
   secure: isProd,
 };
 
-function makeTransporter() {
-  // family:4 forces IPv4 — Render free tier has no IPv6
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    family: 4,
-    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
+async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  await getResend().emails.send({
+    from: "Coinfinex <onboarding@resend.dev>",
+    to,
+    subject,
+    html,
+  });
 }
 
 function otpEmailHtml(otp: string): string {
@@ -102,12 +103,7 @@ export const sendOtp = async (req: Request, res: Response): Promise<void> => {
   setOtp(email, otp);
 
   try {
-    await makeTransporter().sendMail({
-      from: `"Coinfinex" <${process.env.GMAIL_USER}>`,
-      to: email,
-      subject: "Your Coinfinex verification code",
-      html: otpEmailHtml(otp),
-    });
+    await sendEmail(email, "Your Coinfinex verification code", otpEmailHtml(otp));
     res.json({ message: "OTP sent" });
   } catch (err) {
     console.error("Email send failed:", err);
@@ -200,12 +196,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
   </div>`;
 
   try {
-    await makeTransporter().sendMail({
-      from: `"Coinfinex" <${process.env.GMAIL_USER}>`,
-      to: email,
-      subject: "Reset your Coinfinex password",
-      html,
-    });
+    await sendEmail(email, "Reset your Coinfinex password", html);
   } catch (err) {
     console.error("Reset email failed:", err);
   }

@@ -83,6 +83,30 @@ export default function Signup() {
           box-shadow: 0 0 25px rgba(0,245,196,0.4);
         }
         .signup-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .google-btn {
+          width: 100%; padding: 11px; border-radius: 10px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.15);
+          color: #f0f0f0;
+          font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.95rem;
+          cursor: pointer; display: flex; align-items: center;
+          justify-content: center; gap: 10px;
+          transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+          margin-top: 12px;
+        }
+        .google-btn:hover {
+          border-color: rgba(0,245,196,0.45);
+          background: rgba(0,245,196,0.06);
+          box-shadow: 0 0 18px rgba(0,245,196,0.12);
+        }
+        .or-divider {
+          display: flex; align-items: center; gap: 10px;
+          margin: 20px 0 4px; color: rgba(240,240,240,0.3);
+          font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .or-divider::before, .or-divider::after {
+          content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1);
+        }
       `}</style>
 
       {/* Aurora */}
@@ -160,6 +184,22 @@ export default function Signup() {
               {loading ? "Creating account…" : "Create account"}
             </button>
           </form>
+
+          <div className="or-divider">or</div>
+
+          <button
+            className="google-btn"
+            type="button"
+            onClick={() => { window.location.href = "http://localhost:5001/api/auth/google"; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.46 3.08 29.5 1 24 1 14.82 1 7.07 6.48 3.66 14.26l7.08 5.5C12.43 13.68 17.73 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.5 24.5c0-1.64-.15-3.22-.42-4.75H24v9h12.68c-.55 2.96-2.2 5.47-4.68 7.15l7.2 5.59C43.18 37.45 46.5 31.44 46.5 24.5z"/>
+              <path fill="#FBBC05" d="M10.74 28.24A14.57 14.57 0 0 1 9.5 24c0-1.47.25-2.89.68-4.24l-7.08-5.5A23.93 23.93 0 0 0 0 24c0 3.87.92 7.53 2.54 10.76l8.2-6.52z"/>
+              <path fill="#34A853" d="M24 47c6.48 0 11.93-2.15 15.9-5.84l-7.2-5.59C30.6 37.45 27.46 38.5 24 38.5c-6.27 0-11.57-4.18-13.26-9.76l-8.2 6.52C6.07 43.52 14.54 47 24 47z"/>
+            </svg>
+            Continue with Google
+          </button>
 
           <div style={{ textAlign:"center", marginTop:20, fontSize:"0.9rem", color:"rgba(240,240,240,0.5)" }}>
             Already have an account?{" "}

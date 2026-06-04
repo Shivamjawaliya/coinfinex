@@ -80,7 +80,7 @@ async function buildPortfolio(userid: string): Promise<{
 // GET /api/portfolio
 export const portfolio = async (req: Request, res: Response): Promise<void> => {
   try {
-    const data = await buildPortfolio(req.user!.email);
+    const data = await buildPortfolio(req.user!.email as string);
     res.json(data);
   } catch (err) {
     console.error(err);
@@ -91,7 +91,7 @@ export const portfolio = async (req: Request, res: Response): Promise<void> => {
 // GET /api/trading
 export const virtualTrading = async (req: Request, res: Response): Promise<void> => {
   try {
-    const data = await buildPortfolio(req.user!.email);
+    const data = await buildPortfolio(req.user!.email as string);
     res.json(data);
   } catch (err) {
     console.error(err);
@@ -102,7 +102,7 @@ export const virtualTrading = async (req: Request, res: Response): Promise<void>
 // POST /api/trading/buy
 export const buyStock = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userid = req.user!.email;
+    const userid = req.user!.email as string;
     const { stockname, stockquantity, stockbuyprice } = req.body as {
       stockname: string;
       stockquantity: number;
@@ -137,7 +137,7 @@ export const buyStock = async (req: Request, res: Response): Promise<void> => {
 // POST /api/trading/sell
 export const sellStock = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userid = req.user!.email;
+    const userid = req.user!.email as string;
     const { stockname, stockquantity } = req.body as { stockname: string; stockquantity: number };
 
     const existing = await UserStocks.findOne({ userid, stockname });
@@ -169,7 +169,7 @@ export const sellStock = async (req: Request, res: Response): Promise<void> => {
 // POST /api/trading/reset
 export const resetPortfolio = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userid = req.user!.email;
+    const userid = req.user!.email as string;
     await UserStocks.deleteMany({ userid });
     res.json({ success: true, message: "Portfolio reset successfully" });
   } catch (err) {

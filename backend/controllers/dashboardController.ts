@@ -4,10 +4,10 @@ import User from "../models/userModel";
 // GET /api/dashboard
 export const dashboard = async (req: Request, res: Response): Promise<void> => {
   try {
-    const email = req.user!.email;
+    const email = req.user!.email as string;
     const u = await User.findOne({ username: email }).select("-password");
 
-    const displayName = u?.username || email;
+    const displayName = u?.username ?? email;
     const initials =
       displayName
         .trim()

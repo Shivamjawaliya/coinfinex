@@ -1,6 +1,0 @@
-1-insttall in backend -  
-npm install passport-google-oauth20 
-npm i passport
-
-2-
-make passport.js file in backend/config

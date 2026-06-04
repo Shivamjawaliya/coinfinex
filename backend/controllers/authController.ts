@@ -17,10 +17,15 @@ const cookieOptions = {
 };
 
 function makeTransporter() {
+  // family:4 forces IPv4 — Render free tier has no IPv6
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    family: 4,
     auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
-  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 }
 
 function otpEmailHtml(otp: string): string {

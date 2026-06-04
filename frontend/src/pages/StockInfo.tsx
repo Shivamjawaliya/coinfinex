@@ -150,7 +150,7 @@ export default function StockInfo() {
       legend:{ display:false },
       tooltip:{ backgroundColor:"#0d0f1a", borderColor:"rgba(255,255,255,.08)", borderWidth:1,
         titleColor: chartDataset?.color ?? "#00f5c4", bodyColor:"#f0f0f0",
-        padding:12, callbacks:{ label:(c: { parsed: { y: number } }) => ` $${c.parsed.y.toFixed(2)}` },
+        padding:12, callbacks:{ label:(c: { parsed: { y: number | null } }) => ` $${c.parsed.y != null ? c.parsed.y.toFixed(2) : ""}` },
       },
     },
     scales:{

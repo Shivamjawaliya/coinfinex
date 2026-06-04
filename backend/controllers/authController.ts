@@ -9,6 +9,12 @@ import { setOtp, getOtp, markVerified, isVerified, clearOtp } from "../utils/otp
 import { createResetToken, consumeResetToken } from "../utils/resetStore";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isProd = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+  secure: isProd,
+};
 
 function makeTransporter() {
   return nodemailer.createTransport({
@@ -59,7 +65,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!valid) { res.status(401).json({ message: "Invalid credentials" }); return; }
 
     const token = jwt.sign({ email }, jwtSecret);
-    res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+    res.cookie("token", token, cookieOptions);
     res.json({ message: "Login successful", user: { name: user.name, username: user.username } });
   } catch (err) {
     console.error("Login failed:", err);
@@ -139,7 +145,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     clearOtp(email);
 
     const token = jwt.sign({ email }, jwtSecret);
-    res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+    res.cookie("token", token, cookieOptions);
     res.status(201).json({
       message: "Signup successful",
       user: { name: created.name, username: created.username },
@@ -152,7 +158,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
 // GET /api/auth/logout
 export const logout = (_req: Request, res: Response): void => {
-  res.clearCookie("token");
+  res.clearCookie("token", cookieOptions);
   res.json({ message: "Logged out" });
 };
 

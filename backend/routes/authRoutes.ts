@@ -31,7 +31,12 @@ router.get(
   (req: Request, res: Response) => {
     const user = req.user as IUser;
     const token = jwt.sign({ email: user.username }, jwtSecret);
-    res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+    const isProd = process.env.NODE_ENV === "production";
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: isProd ? "none" : "lax",
+      secure: isProd,
+    });
     res.redirect(`${frontendUrl}/explore`);
   }
 );

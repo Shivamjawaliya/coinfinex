@@ -12,6 +12,8 @@ export const login = (email: string, password: string) =>
 export const signup = (name: string, email: string, password: string, confirmPassword: string) =>
   api.post("/auth/signup", { name, email, password, confirmPassword });
 export const logout = () => api.get("/auth/logout");
+export const sendOtp = (email: string) => api.post("/auth/send-otp", { email });
+export const verifyOtp = (email: string, otp: string) => api.post("/auth/verify-otp", { email, otp });
 
 // Dashboard
 export const getDashboard = () => api.get("/dashboard");

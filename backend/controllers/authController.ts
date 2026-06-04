@@ -162,7 +162,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
 
   const user = await User.findOne({ username: email });
   // Always respond OK to avoid email enumeration
-  if (!user || !user.password) {
+  if (!user) {
     res.json({ message: "If that email exists, a reset link has been sent." });
     return;
   }

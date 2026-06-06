@@ -35,18 +35,17 @@ export default function Sidebar({ user, active }: SidebarProps) {
   return (
         <>
       {/* Hamburger button — mobile only */}
-      {/* <button
+      <button
         className="sb-hamburger"
         onClick={() => setOpen(o => !o)}
         aria-label="Toggle menu"
       >
         <span/><span/><span/>
-      </button> */}
-
+      </button>
        {/* Overlay — mobile only */}
-      {/* {open && <div className="sb-overlay" onClick={() => setOpen(false)}/>} */}
+      {open && <div className="sb-overlay" onClick={() => setOpen(false)}/>}
 
-      {/* <aside className={`sidebar${open ? " sidebar-open" : ""}`}>
+      <aside className={`sidebar${open ? " sidebar-open" : ""}`}>
         <NavLink to="/explore" className="sb-logo" onClick={() => setOpen(false)}>
           Coinfinex
         </NavLink>
@@ -81,8 +80,10 @@ export default function Sidebar({ user, active }: SidebarProps) {
           </div>
           <button className="sb-logout" onClick={handleLogout}>↩ Log Out</button>
         </div>
-        </aside> */}
-        <h1 style={{position:"fixed",top:20,left:20,fontSize:"1.5rem",fontWeight:800,background:"linear-gradient(135deg,#f0f,#0ff)",color:"transparent",backgroundClip:"text",WebkitBackgroundClip:"text",zIndex:100}}>then menu is closed for now :</h1>
-    </>
+        <button className="sb-logout" onClick={handleLogout}>
+          ↩ Log Out
+        </button>
+      </div>
+    </aside>
   );
 }

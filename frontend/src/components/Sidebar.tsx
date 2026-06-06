@@ -30,9 +30,8 @@ export default function Sidebar({ user, active }: SidebarProps) {
     <>
       {/* Hamburger button — mobile only */}
       <button
-        className="sb-hamburger"
+        className={`sb-hamburger${open ? " open" : ""}`}
         onClick={() => setOpen(o => !o)}
-        aria-label="Toggle menu"
       >
         <span /><span /><span />
       </button>

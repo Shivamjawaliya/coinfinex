@@ -80,7 +80,7 @@ export default function CandleChart({ candles, symbol, height = 420 }: Props) {
             bodyColor:       "#f0f0f0",
             padding:         12,
             callbacks: {
-              label: (ctx) => {
+              label: (ctx : any) => {
                 const d = ctx.raw as any;
                 return [
                   `Open:  $${d.o?.toFixed(2)}`,
@@ -109,7 +109,7 @@ export default function CandleChart({ candles, symbol, height = 420 }: Props) {
             ticks: {
               color:    "rgba(240,240,240,0.35)",
               font:     { family: "DM Sans", size: 10 },
-              callback: (v) => `$${Number(v).toFixed(2)}`,
+              callback: (v: any) => `$${Number(v).toFixed(2)}`,
             },
           },
         },

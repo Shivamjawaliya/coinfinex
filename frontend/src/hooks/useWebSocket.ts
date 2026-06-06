@@ -23,7 +23,7 @@ export function useWebSocket(symbol: string | null): UseWebSocketReturn {
   const [error,       setError]       = useState<string | null>(null);
 
   const wsRef      = useRef<WebSocket | null>(null);
-  const reconnectRef = useRef<ReturnType<typeof setTimeout>>();
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const connect = useCallback(() => {
     if (!symbol) return;
@@ -79,7 +79,7 @@ export function useWebSocket(symbol: string | null): UseWebSocketReturn {
     ws.onclose = () => {
       setIsConnected(false);
       console.warn(`WS closed for ${symbol} — reconnecting in 3s`);
-      reconnectRef.current = setTimeout(connect, 3000);
+      reconnectRef.current = setTimeout(() => connect(), 3000);
     };
 
     ws.onerror = () => {

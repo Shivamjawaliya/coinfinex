@@ -15,67 +15,6 @@ const NAV = [
   { key: "news",            href: "/news",            icon: "📰", label: "News"            },
 ];
 
-const styles = `
-  .sb-hamburger {
-    display: none;
-  }
-
-  @media (max-width: 768px) {
-    .sb-hamburger {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 10px;
-      z-index: 1001;
-      position: fixed;
-      top: 16px;
-      left: 16px;
-    }
-
-    .sb-hamburger span {
-      display: block;
-      width: 25px;
-      height: 3px;
-      background: #fff;
-      border-radius: 3px;
-    }
-
-    .sidebar {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      height: 100vh !important;
-      z-index: 1000 !important;
-      transform: translateX(-100%) !important;
-      transition: transform 0.3s ease !important;
-    }
-
-    .sidebar.sidebar-open {
-      transform: translateX(0) !important;
-    }
-
-    .sb-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-    }
-  }
-
-  @media (min-width: 769px) {
-    .sb-hamburger {
-      display: none !important;
-    }
-
-    .sidebar {
-      transform: translateX(0) !important;
-      position: relative !important;
-    }
-  }
-`;
 
 export default function Sidebar({ user, active }: SidebarProps) {
   const { user: authUser, logout } = useAuth();
@@ -96,8 +35,6 @@ export default function Sidebar({ user, active }: SidebarProps) {
 
   return (
     <>
-      {/* Inject styles */}
-      <style>{styles}</style>
 
       {/* Hamburger button — mobile only */}
       <button

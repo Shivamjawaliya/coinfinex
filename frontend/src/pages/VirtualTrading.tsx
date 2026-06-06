@@ -352,9 +352,12 @@ export default function VirtualTrading() {
                                 <tr key={item.stockname}>
                                   <td>
                                     <div style={{display:"flex",alignItems:"center",gap:10}}>
+                                      <a href={`/stock/${item.stockname}`} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10}}>
                                       <div style={{width:34,height:34,borderRadius:9,background:`linear-gradient(135deg,${c},${c}88)`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Syne',sans-serif",fontSize:"0.68rem",fontWeight:800,color:"#03040a",flexShrink:0}}>
                                         {item.stockname.slice(0,2).toUpperCase()}
                                       </div>
+                                      </a>
+
                                       <div>
                                         <div style={{fontFamily:"'Syne',sans-serif",fontSize:"0.88rem",fontWeight:800}}>{item.stockname}</div>
                                         <span style={{display:"inline-block",padding:"2px 8px",borderRadius:6,fontSize:"0.65rem",fontWeight:700,background:"rgba(0,245,196,.12)",color:"var(--neon)",border:"1px solid rgba(0,245,196,.2)"}}>stock</span>

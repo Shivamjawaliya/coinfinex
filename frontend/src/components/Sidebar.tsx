@@ -9,6 +9,7 @@ const NAV = [
   { key: "dashboard", href: "/explore", icon: "⚡", label: "Explore" },
   { key: "categories", href: "/categories", icon: "📊", label: "Categories" },
   { key: "virtual-trading", href: "/virtual-trading", icon: "📦", label: "Virtual Trading" },
+  { key: "intraday", href: "/intraday", icon: "📰", label: "Intraday" },
   { key: "portfolio", href: "/portfolio", icon: "💼", label: "Portfolio" },
   { key: "news", href: "/news", icon: "📰", label: "News" },
 ];

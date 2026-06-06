@@ -260,9 +260,11 @@ export default function Portfolio() {
                                 <tr key={item.stockname}>
                                   <td>
                                     <div style={{display:"flex",alignItems:"center",gap:12}}>
-                                      <div style={{width:36,height:36,borderRadius:9,background:`linear-gradient(135deg,${c},${c}88)`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Syne',sans-serif",fontSize:"0.72rem",fontWeight:800,color:"#03040a",flexShrink:0}}>
-                                        {item.stockname.slice(0,2).toUpperCase()}
-                                      </div>
+                                      <a href={`/stock/${item.stockname}`} rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:10}}>
+                                        <div style={{width:36,height:36,borderRadius:9,background:`linear-gradient(135deg,${c},${c}88)`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Syne',sans-serif",fontSize:"0.72rem",fontWeight:800,color:"#03040a",flexShrink:0}}>
+                                          {item.stockname.slice(0,2).toUpperCase()}
+                                        </div>
+                                      </a>
                                       <div>
                                         <div style={{fontFamily:"'Syne',sans-serif",fontSize:"0.9rem",fontWeight:800}}>{item.stockname}</div>
                                         <div style={{fontSize:"0.72rem",color:"var(--muted)",marginTop:2}}>Virtual Position</div>

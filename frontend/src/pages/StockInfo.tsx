@@ -198,7 +198,7 @@ export default function StockInfo() {
       <canvas ref={canvasRef} style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none"}}/>
       <div className="aurora"><div className="ab"/><div className="ab"/><div className="ab"/></div>
       <div className="grid-lines"/>
-      <Sidebar active="categories"/>
+      {/* <Sidebar active="categories"/> */}
       {toast && <Toast msg={toast.msg} ok={toast.ok}/>}
 
       <div className="page-wrap">

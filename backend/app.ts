@@ -4,6 +4,7 @@ import cors from "cors";
 import passport from "passport";
 import { frontendUrl } from "./config/keys";
 import "./config/passport";
+import ordersRouter from "./routes/orders";
 
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
@@ -32,6 +33,7 @@ app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/trading", tradingRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api", ordersRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });

@@ -25,6 +25,7 @@ export default function Categories() {
       <div className="aurora"><div className="ab" /><div className="ab" /><div className="ab" /></div>
       <div className="grid-lines" />
       <Sidebar active="categories" />
+      <div className="page-wrap" style={{ flex: 1, overflow: "auto" }}>
       <div className="page-wrap">
         <div className="live-bar">
           <div className="live-dot" /><span className="live-text">Live</span>
@@ -97,6 +98,7 @@ export default function Categories() {
             </>
           )}
         </div>
+      </div>
       </div>
     </>
   );

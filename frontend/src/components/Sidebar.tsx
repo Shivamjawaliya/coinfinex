@@ -44,17 +44,17 @@ const styles = `
     }
 
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      z-index: 1000;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      height: 100vh !important;
+      z-index: 1000 !important;
+      transform: translateX(-100%) !important;
+      transition: transform 0.3s ease !important;
     }
 
-    .sidebar-open {
-      transform: translateX(0);
+    .sidebar.sidebar-open {
+      transform: translateX(0) !important;
     }
 
     .sb-overlay {
@@ -67,12 +67,12 @@ const styles = `
 
   @media (min-width: 769px) {
     .sb-hamburger {
-      display: none;
+      display: none !important;
     }
 
     .sidebar {
       transform: translateX(0) !important;
-      position: relative;
+      position: relative !important;
     }
   }
 `;

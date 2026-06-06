@@ -8,23 +8,85 @@ interface SidebarProps {
 }
 
 const NAV = [
-  { key: "dashboard",       href: "/explore",        icon: "⚡", label: "Explore"         },
-  { key: "categories",      href: "/categories",     icon: "📊", label: "Categories"      },
-  { key: "virtual-trading", href: "/virtual-trading",icon: "📦", label: "Virtual Trading" },
-  { key: "portfolio",       href: "/portfolio",      icon: "💼", label: "Portfolio"        },
-  { key: "news",            href: "/news",           icon: "📰", label: "News"             },
+  { key: "dashboard",       href: "/explore",         icon: "⚡", label: "Explore"         },
+  { key: "categories",      href: "/categories",      icon: "📊", label: "Categories"      },
+  { key: "virtual-trading", href: "/virtual-trading", icon: "📦", label: "Virtual Trading" },
+  { key: "portfolio",       href: "/portfolio",       icon: "💼", label: "Portfolio"       },
+  { key: "news",            href: "/news",            icon: "📰", label: "News"            },
 ];
+
+const styles = `
+  .sb-hamburger {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .sb-hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      z-index: 1001;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+    }
+
+    .sb-hamburger span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-open {
+      transform: translateX(0);
+    }
+
+    .sb-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .sb-hamburger {
+      display: none;
+    }
+
+    .sidebar {
+      transform: translateX(0) !important;
+      position: relative;
+    }
+  }
+`;
 
 export default function Sidebar({ user, active }: SidebarProps) {
   const { user: authUser, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const displayUser = user ?? authUser;
 
+  const displayUser = user ?? authUser;
   const initials = displayUser
     ? (displayUser as any).initials
       ?? (displayUser.name ?? displayUser.username ?? "U")
-           .trim().split(/\s+/).slice(0, 2).map((p: string) => p[0].toUpperCase()).join("")
+        .trim().split(/\s+/).slice(0, 2).map((p: string) => p[0].toUpperCase()).join("")
     : "U";
 
   const handleLogout = async () => {
@@ -33,7 +95,10 @@ export default function Sidebar({ user, active }: SidebarProps) {
   };
 
   return (
-        <>
+    <>
+      {/* Inject styles */}
+      <style>{styles}</style>
+
       {/* Hamburger button — mobile only */}
       <button
         className="sb-hamburger"
@@ -43,15 +108,16 @@ export default function Sidebar({ user, active }: SidebarProps) {
         <span/><span/><span/>
       </button>
 
-       {/* Overlay — mobile only */}
+      {/* Overlay — mobile only */}
       {open && <div className="sb-overlay" onClick={() => setOpen(false)}/>}
 
       <aside className={`sidebar${open ? " sidebar-open" : ""}`}>
-         <NavLink to="/explore" className="sb-logo" onClick={() => setOpen(false)}>
+        <NavLink to="/explore" className="sb-logo" onClick={() => setOpen(false)}>
           Coinfinex
         </NavLink>
 
         <div className="sb-section-label">Main</div>
+
         <ul className="sb-nav">
           {NAV.map((n) => (
             <li key={n.key}>
@@ -81,7 +147,7 @@ export default function Sidebar({ user, active }: SidebarProps) {
           </div>
           <button className="sb-logout" onClick={handleLogout}>↩ Log Out</button>
         </div>
-        </aside>
+      </aside>
     </>
   );
 }

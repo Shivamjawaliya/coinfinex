@@ -42,11 +42,12 @@ export default function Sidebar({ user, active }: SidebarProps) {
       >
         <span/><span/><span/>
       </button>
+
        {/* Overlay — mobile only */}
       {open && <div className="sb-overlay" onClick={() => setOpen(false)}/>}
 
       <aside className={`sidebar${open ? " sidebar-open" : ""}`}>
-        <NavLink to="/explore" className="sb-logo" onClick={() => setOpen(false)}>
+         <NavLink to="/explore" className="sb-logo" onClick={() => setOpen(false)}>
           Coinfinex
         </NavLink>
 
@@ -80,10 +81,7 @@ export default function Sidebar({ user, active }: SidebarProps) {
           </div>
           <button className="sb-logout" onClick={handleLogout}>↩ Log Out</button>
         </div>
-        <button className="sb-logout" onClick={handleLogout}>
-          ↩ Log Out
-        </button>
-      </div>
-    </aside>
+        </aside>
+    </>
   );
 }

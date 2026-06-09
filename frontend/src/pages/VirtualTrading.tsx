@@ -92,13 +92,15 @@ export default function VirtualTrading() {
   useEffect(() => {
     if (!data?.portfolio.length) return;
     const syms = data.portfolio.map(p => p.stockname);
-    const poll = setInterval(async () => {
+    const fetchAll = async () => {
       const prices: Record<string,number> = {};
       await Promise.allSettled(syms.map(s =>
         getStockPrice(s).then(r => { if (r.data.success) prices[s]=r.data.price; })
       ));
       setLivePrices(prev => ({...prev,...prices}));
-    }, 15000);
+    };
+    fetchAll();
+    const poll = setInterval(fetchAll, 15000);
     return () => clearInterval(poll);
   }, [data]);
 

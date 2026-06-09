@@ -59,8 +59,10 @@ export default function Transactions() {
               </div>
 
               {txns.map((t, i) => {
-                const isBuy  = t.orderType === "buy";
-                // BUY total = amount spent; SELL total = P&L (sell - buy) × qty
+                const isBuy = t.orderType === "buy";
+                // old sell records have targetPrice = executedPrice (sell price stored in both fields)
+                // new records have targetPrice = buy price, executedPrice = actual sell price
+                const hasRealPnl = !isBuy && t.executedPrice !== t.targetPrice;
                 const pnl    = isBuy
                   ? -(t.executedPrice * t.quantity)
                   : (t.executedPrice - t.targetPrice) * t.quantity;
@@ -82,14 +84,18 @@ export default function Transactions() {
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
                     {/* Buy Price */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${t.targetPrice.toFixed(2)}</span>
-                    {/* Sell Price — show "—" for BUY rows */}
+                    {/* Sell Price — "—" for BUY; for old SELL records where both prices equal, show "—" */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
-                      {isBuy ? "—" : `$${t.executedPrice.toFixed(2)}`}
+                      {isBuy || !hasRealPnl ? "—" : `$${t.executedPrice.toFixed(2)}`}
                     </span>
-                    {/* P&L for sells, total spent for buys */}
-                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem", color: isBuy ? "#ff4d6d" : pnlPos ? "#00e676" : "#ff4d6d" }}>
-                      {isBuy ? `-$${(t.executedPrice * t.quantity).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
-                             : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
+                    {/* P&L: buy = total spent; sell = price diff × qty; old records = "—" */}
+                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
+                      color: isBuy ? "#ff4d6d" : hasRealPnl ? (pnlPos ? "#00e676" : "#ff4d6d") : "var(--muted)" }}>
+                      {isBuy
+                        ? `-$${(t.executedPrice * t.quantity).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
+                        : hasRealPnl
+                          ? `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
+                          : "—"}
                     </span>
                   </div>
                 );

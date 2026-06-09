@@ -154,18 +154,19 @@ export const sellStock = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const sellPrice = stocksellprice ?? existing.stockbuyprice;
+    const buyPrice  = existing.stockbuyprice;
+    const sellPrice = stocksellprice ?? buyPrice;
 
     if (Number(stockquantity) === existing.stockquantity) {
       await UserStocks.deleteOne({ userid, stockname });
-      await Order.create({ userid, stockname, orderType: "sell", targetPrice: sellPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
+      await Order.create({ userid, stockname, orderType: "sell", targetPrice: buyPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
       res.json({ success: true, message: "Stock sold successfully" });
       return;
     }
 
     existing.stockquantity -= Number(stockquantity);
     await existing.save();
-    await Order.create({ userid, stockname, orderType: "sell", targetPrice: sellPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
+    await Order.create({ userid, stockname, orderType: "sell", targetPrice: buyPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
     res.json({ success: true, message: "Stock sold successfully" });
   } catch (err) {
     console.error(err);

@@ -96,7 +96,7 @@ export default function Intraday() {
     if (!livePrice) { showNotif("No live price available", "error"); return; }
 
     try {
-      const url  = buyType === "buy" ? "/api/buy-stock" : "/api/sell-stock";
+      const url  = buyType === "buy" ? `${API_BASE}/api/buy-stock` : `${API_BASE}/api/sell-stock`;
       const body = buyType === "buy"
         ? { stockname: symbol, stockquantity: buyQty, stockbuyprice: livePrice }
         : { stockname: symbol, stockquantity: buyQty };
@@ -151,7 +151,7 @@ export default function Intraday() {
 
   async function loadOrders() {
     try {
-      const r = await fetch("/api/my-orders", { credentials: "include" });
+      const r = await fetch(`${API_BASE}/api/my-orders`, { credentials: "include" });
       const d = await r.json();
       setOrders(d.orders || []);
     } catch { /* silent */ }
@@ -159,7 +159,7 @@ export default function Intraday() {
 
   async function cancelOrder(id: string) {
     try {
-      const r = await fetch(`/api/cancel-order/${id}`, {
+      const r = await fetch(`${API_BASE}/api/cancel-order/${id}`, {
         method: "POST", credentials: "include",
       });
       const d = await r.json();

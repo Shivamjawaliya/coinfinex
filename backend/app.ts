@@ -2,8 +2,9 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import passport from "passport";
-import session    from "express-session";  
-import { frontendUrl, jwtSecret } from "./config/keys";
+import session    from "express-session";
+import MongoStore  from "connect-mongo";
+import { frontendUrl, jwtSecret, mongoUri } from "./config/keys";
 import "./config/passport";
 import ordersRouter from "./routes/orders";
 import wishlistRouter from "./routes/wishlist";
@@ -31,6 +32,7 @@ app.use(session({
   secret:            jwtSecret as string,
   resave:            false,
   saveUninitialized: false,
+  store:             MongoStore.create({ mongoUrl: mongoUri }),
 }));
 
 app.use(passport.initialize());

@@ -41,6 +41,7 @@ export async function checkOrdersForSymbol(symbol: string, price: number) {
           }
           user.balance = parseFloat((user.balance - cost).toFixed(2));
           await user.save();
+          await Order.findByIdAndUpdate(order._id, { status: "executed", executedAt: new Date(), executedPrice: price, buyPrice: price });
 
         } else {
           const existing = await Stock.findOne({ userid: order.userid, stockname: symbol });
@@ -49,14 +50,15 @@ export async function checkOrdersForSymbol(symbol: string, price: number) {
             console.warn(`❌ Cancelled SELL ${symbol} — insufficient shares [${order.userid}]`);
             continue;
           }
+          const originalBuyPrice = existing.stockbuyprice;
           existing.stockquantity === order.quantity
             ? await Stock.deleteOne({ userid: order.userid, stockname: symbol })
             : (existing.stockquantity -= order.quantity, await existing.save());
           user.balance = parseFloat((user.balance + price * order.quantity).toFixed(2));
           await user.save();
+          await Order.findByIdAndUpdate(order._id, { status: "executed", executedAt: new Date(), executedPrice: price, buyPrice: originalBuyPrice });
         }
 
-        await Order.findByIdAndUpdate(order._id, { status: "executed", executedAt: new Date(), executedPrice: price });
         console.log(`✅ Executed: ${order.orderType.toUpperCase()} ${order.quantity} ${symbol} @ $${price} [${order.userid}]`);
 
       } catch (e: any) {
@@ -118,7 +120,6 @@ export async function checkAndExecuteOrders() {
         if (order.orderType === "buy") {
           const cost = price * order.quantity;
 
-          // Ensure user can still afford it at execution time
           if (user.balance < cost) {
             await Order.findByIdAndUpdate(order._id, { status: "cancelled" });
             console.warn(`❌ Cancelled BUY ${order.stockname} — insufficient balance [${order.userid}]`);
@@ -144,9 +145,9 @@ export async function checkAndExecuteOrders() {
             });
           }
 
-          // Deduct balance
           user.balance = parseFloat((user.balance - cost).toFixed(2));
           await user.save();
+          await Order.findByIdAndUpdate(order._id, { status: "executed", executedAt: new Date(), executedPrice: price, buyPrice: price });
 
         } else {
           const existing = await Stock.findOne({ userid: order.userid, stockname: order.stockname });
@@ -157,6 +158,8 @@ export async function checkAndExecuteOrders() {
             continue;
           }
 
+          const originalBuyPrice = existing.stockbuyprice;
+
           if (existing.stockquantity === order.quantity) {
             await Stock.deleteOne({ userid: order.userid, stockname: order.stockname });
           } else {
@@ -164,17 +167,11 @@ export async function checkAndExecuteOrders() {
             await existing.save();
           }
 
-          // Credit balance
           const proceeds = parseFloat((price * order.quantity).toFixed(2));
           user.balance   = parseFloat((user.balance + proceeds).toFixed(2));
           await user.save();
+          await Order.findByIdAndUpdate(order._id, { status: "executed", executedAt: new Date(), executedPrice: price, buyPrice: originalBuyPrice });
         }
-
-        await Order.findByIdAndUpdate(order._id, {
-          status:        "executed",
-          executedAt:    new Date(),
-          executedPrice: price,
-        });
 
         console.log(
           `✅ Executed: ${order.orderType.toUpperCase()} ` +

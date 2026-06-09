@@ -9,6 +9,7 @@ const orderSchema = new mongoose.Schema({
   status:        { type: String, enum: ["pending", "executed", "cancelled"], default: "pending" },
   executedAt:    { type: Date },
   executedPrice: { type: Number },
+  buyPrice:      { type: Number },
   createdAt:     { type: Date, default: Date.now },
 });
 

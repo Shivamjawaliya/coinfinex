@@ -123,13 +123,13 @@ export const buyStock = async (req: Request, res: Response): Promise<void> => {
       existing.stockquantity = totalQty;
       existing.stockbuyprice = avgPrice;
       await existing.save();
-      await Order.create({ userid, stockname, orderType: "buy", targetPrice: Number(newPrice), quantity: Number(newQty), status: "executed", executedAt: new Date(), executedPrice: Number(newPrice) });
+      await Order.create({ userid, stockname, orderType: "buy", targetPrice: Number(newPrice), quantity: Number(newQty), status: "executed", executedAt: new Date(), executedPrice: Number(newPrice), buyPrice: Number(newPrice) });
       res.json({ success: true, message: "Stock updated successfully" });
       return;
     }
 
     await UserStocks.create({ userid, stockname, stockquantity, stockbuyprice });
-    await Order.create({ userid, stockname, orderType: "buy", targetPrice: Number(stockbuyprice), quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: Number(stockbuyprice) });
+    await Order.create({ userid, stockname, orderType: "buy", targetPrice: Number(stockbuyprice), quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: Number(stockbuyprice), buyPrice: Number(stockbuyprice) });
     res.json({ success: true, message: "Stock purchased successfully" });
   } catch (err) {
     console.error(err);
@@ -159,14 +159,14 @@ export const sellStock = async (req: Request, res: Response): Promise<void> => {
 
     if (Number(stockquantity) === existing.stockquantity) {
       await UserStocks.deleteOne({ userid, stockname });
-      await Order.create({ userid, stockname, orderType: "sell", targetPrice: buyPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
+      await Order.create({ userid, stockname, orderType: "sell", targetPrice: buyPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice, buyPrice });
       res.json({ success: true, message: "Stock sold successfully" });
       return;
     }
 
     existing.stockquantity -= Number(stockquantity);
     await existing.save();
-    await Order.create({ userid, stockname, orderType: "sell", targetPrice: buyPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
+    await Order.create({ userid, stockname, orderType: "sell", targetPrice: buyPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice, buyPrice });
     res.json({ success: true, message: "Stock sold successfully" });
   } catch (err) {
     console.error(err);

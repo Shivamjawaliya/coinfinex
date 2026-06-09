@@ -10,6 +10,7 @@ interface Transaction {
   executedPrice: number;
   executedAt: string;
   targetPrice: number;
+  buyPrice?: number;
 }
 
 export default function Transactions() {
@@ -59,9 +60,11 @@ export default function Transactions() {
               </div>
 
               {txns.map((t, i) => {
-                const isBuy  = t.orderType === "buy";
-                const pnl    = (t.executedPrice - t.targetPrice) * t.quantity;
-                const pnlPos = pnl >= 0;
+                const isBuy    = t.orderType === "buy";
+                // Use explicit buyPrice if available, fall back to targetPrice for old records
+                const buyPrice = t.buyPrice ?? t.targetPrice;
+                const pnl      = (t.executedPrice - buyPrice) * t.quantity;
+                const pnlPos   = pnl >= 0;
                 return (
                   <div key={t._id}
                     style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 0.9fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}
@@ -77,16 +80,18 @@ export default function Transactions() {
                       {t.orderType}
                     </span>
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
-                    {/* Buy Price */}
-                    <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${t.targetPrice.toFixed(2)}</span>
-                    {/* Sell Price — "—" for BUY rows */}
+                    {/* Buy Price — actual price paid when buying */}
+                    <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${buyPrice.toFixed(2)}</span>
+                    {/* Sell Price — actual execution price for SELL; "—" for BUY */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
                       {isBuy ? "—" : `$${t.executedPrice.toFixed(2)}`}
                     </span>
-                    {/* P&L — "—" for BUY, profit/loss for SELL */}
+                    {/* P&L — $0.00 for BUY (unrealised); profit/loss for SELL */}
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
                       color: isBuy ? "var(--muted)" : pnlPos ? "#00e676" : "#ff4d6d" }}>
-                      {isBuy ? "—" : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
+                      {isBuy
+                        ? <span style={{ color:"var(--muted)" }}>$0.00</span>
+                        : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
                     </span>
                   </div>
                 );

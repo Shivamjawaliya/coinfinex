@@ -31,11 +31,11 @@
     "resend": "^6.12.4",
     "typescript": "^5.8.3",
     "ws": "^8.21.0",
-    "yahoo-finance2": "^3.14.1"
+    "yahoo-finance2": "^3.14.1",
+    "@types/express-session": "^1.19.0",
+    "@types/ws": "^8.18.1"
   },
   "devDependencies": {
-    "@types/express-session": "^1.19.0",
-    "@types/ws": "^8.18.1",
     "tsx": "^4.19.3"
   }
 }

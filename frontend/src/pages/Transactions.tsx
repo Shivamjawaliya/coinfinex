@@ -82,15 +82,16 @@ export default function Transactions() {
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
                     {/* Buy Price — actual price paid when buying */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${buyPrice.toFixed(2)}</span>
-                    {/* Sell Price — actual execution price for SELL; "—" for BUY */}
+                    {/* Sell Price — actual execution price for SELL; "—" for BUY or missing */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
-                      {isBuy ? "—" : `$${t.executedPrice.toFixed(2)}`}
+                      {isBuy || !t.executedPrice ? "—" : `$${t.executedPrice.toFixed(2)}`}
                     </span>
                     {/* P&L — $0.00 for BUY (unrealised); profit/loss for SELL */}
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
                       color: isBuy ? "var(--muted)" : pnlPos ? "#00e676" : "#ff4d6d" }}>
                       {isBuy
                         ? <span style={{ color:"var(--muted)" }}>$0.00</span>
+                        : !t.executedPrice ? "—"
                         : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
                     </span>
                   </div>

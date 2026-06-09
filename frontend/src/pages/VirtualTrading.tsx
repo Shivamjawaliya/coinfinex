@@ -76,6 +76,7 @@ export default function VirtualTrading() {
   /* sell-from-table modal */
   const [sellModal, setSellModal]   = useState<PortfolioItem|null>(null);
   const [sellQty, setSellQty]       = useState(1);
+  const [submitting, setSubmitting] = useState(false);
 
   /* ── load portfolio ─────────────────────────────────── */
   const load = useCallback(() => {
@@ -163,29 +164,34 @@ export default function VirtualTrading() {
 
   /* ── confirm buy ────────────────────────────────────── */
   const confirmBuy = async () => {
-    if (!selSym || !livePrice) return;
+    if (!selSym || !livePrice || submitting) return;
+    setSubmitting(true);
     try {
       await buyStock(selSym, qty, livePrice);
       setShowModal(false);
       toast(`✓ Bought ${qty} × ${selSym}`, "success");
       load();
     } catch { toast("Trade failed", "error"); }
+    setSubmitting(false);
   };
 
   /* ── confirm sell from modal ────────────────────────── */
   const confirmSell = async () => {
-    if (!selSym || !livePrice) return;
+    if (!selSym || !livePrice || submitting) return;
+    setSubmitting(true);
     try {
       await sellStock(selSym, qty, livePrice);
       setShowModal(false);
       toast(`✓ Sold ${qty} × ${selSym}`, "success");
       load();
     } catch { toast("Sell failed","error"); }
+    setSubmitting(false);
   };
 
   /* ── sell from table ────────────────────────────────── */
   const confirmTableSell = async () => {
-    if (!sellModal) return;
+    if (!sellModal || submitting) return;
+    setSubmitting(true);
     try {
       const sellPrice = livePrices[sellModal.stockname] ?? sellModal.currentPrice;
       await sellStock(sellModal.stockname, sellQty, sellPrice);
@@ -193,6 +199,7 @@ export default function VirtualTrading() {
       toast(`✓ Sold ${sellQty} × ${sellModal.stockname}`, "success");
       load();
     } catch { toast("Sell failed","error"); }
+    setSubmitting(false);
   };
 
   /* ── reset ──────────────────────────────────────────── */
@@ -579,11 +586,11 @@ export default function VirtualTrading() {
 
             {/* Confirm */}
             <button onClick={tradeMode==="buy"?confirmBuy:confirmSell}
-              disabled={!selSym||!livePrice}
-              style={{width:"100%",padding:15,border:"none",borderRadius:14,fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:"0.95rem",cursor:!selSym||!livePrice?"not-allowed":"pointer",transition:"all .25s",letterSpacing:"0.5px",textTransform:"uppercase",opacity:!selSym||!livePrice?.4:1,
+              disabled={!selSym||!livePrice||submitting}
+              style={{width:"100%",padding:15,border:"none",borderRadius:14,fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:"0.95rem",cursor:(!selSym||!livePrice||submitting)?"not-allowed":"pointer",transition:"all .25s",letterSpacing:"0.5px",textTransform:"uppercase",opacity:(!selSym||!livePrice||submitting)?.4:1,
                 background:tradeMode==="buy"?"linear-gradient(135deg,#00f5c4,#7b61ff)":"linear-gradient(135deg,#ff4d6d,#7b61ff)",
                 color:tradeMode==="buy"?"#03040a":"white"}}>
-              CONFIRM {tradeMode.toUpperCase()}
+              {submitting ? "Processing…" : `CONFIRM ${tradeMode.toUpperCase()}`}
             </button>
           </div>
         </div>
@@ -619,8 +626,9 @@ export default function VirtualTrading() {
               </span>
             </div>
             <button onClick={confirmTableSell}
-              style={{width:"100%",padding:15,border:"none",borderRadius:14,background:"linear-gradient(135deg,#ff4d6d,#7b61ff)",color:"white",fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:"1rem",cursor:"pointer",transition:"all .25s",letterSpacing:"0.5px"}}>
-              CONFIRM SELL
+              disabled={submitting}
+              style={{width:"100%",padding:15,border:"none",borderRadius:14,background:"linear-gradient(135deg,#ff4d6d,#7b61ff)",color:"white",fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:"1rem",cursor:submitting?"not-allowed":"pointer",transition:"all .25s",letterSpacing:"0.5px",opacity:submitting?.5:1}}>
+              {submitting ? "Processing…" : "CONFIRM SELL"}
             </button>
           </div>
         </div>

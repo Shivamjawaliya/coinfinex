@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dns from "dns";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import User from "../models/userModel";
 import { jwtSecret } from "../config/keys";
 import { setOtp, getOtp, markVerified, isVerified, clearOtp } from "../utils/otpStore";
@@ -17,27 +17,11 @@ const cookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
-function getTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout:   10000,
-  });
-}
-
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  await getTransporter().sendMail({
-    from: `"Coinfinex" <${process.env.GMAIL_USER}>`,
-    to,
-    subject,
-    html,
-  });
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const from   = process.env.RESEND_FROM || "onboarding@resend.dev";
+  const { error } = await resend.emails.send({ from: `Coinfinex <${from}>`, to, subject, html });
+  if (error) throw new Error(error.message);
 }
 
 function otpEmailHtml(otp: string): string {

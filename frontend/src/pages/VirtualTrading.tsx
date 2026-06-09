@@ -74,8 +74,10 @@ export default function VirtualTrading() {
   const [showResults, setShowResults] = useState(false);
 
   /* sell-from-table modal */
-  const [sellModal, setSellModal]   = useState<PortfolioItem|null>(null);
-  const [sellQty, setSellQty]       = useState(1);
+  const [sellModal, setSellModal]         = useState<PortfolioItem|null>(null);
+  const [sellQty, setSellQty]             = useState(1);
+  const [modalSellPrice, setModalSellPrice] = useState(0);
+  const [modalPriceFetching, setModalPriceFetching] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   /* ── load portfolio ─────────────────────────────────── */
@@ -190,10 +192,10 @@ export default function VirtualTrading() {
 
   /* ── sell from table ────────────────────────────────── */
   const confirmTableSell = async () => {
-    if (!sellModal || submitting) return;
+    if (!sellModal || submitting || modalPriceFetching) return;
     setSubmitting(true);
     try {
-      const sellPrice = livePrices[sellModal.stockname] ?? sellModal.currentPrice;
+      const sellPrice = modalSellPrice || livePrices[sellModal.stockname] || sellModal.currentPrice;
       await sellStock(sellModal.stockname, sellQty, sellPrice);
       setSellModal(null);
       toast(`✓ Sold ${sellQty} × ${sellModal.stockname}`, "success");
@@ -385,7 +387,16 @@ export default function VirtualTrading() {
                                     </span>
                                   </td>
                                   <td>
-                                    <button onClick={() => { setSellModal(item); setSellQty(1); }}
+                                    <button onClick={async () => {
+                                        setSellModal(item); setSellQty(1);
+                                        setModalSellPrice(0); setModalPriceFetching(true);
+                                        try {
+                                          const r = await getStockPrice(item.stockname);
+                                          if (r.data.success && r.data.price > 0) setModalSellPrice(r.data.price);
+                                          else setModalSellPrice(livePrices[item.stockname] ?? item.currentPrice);
+                                        } catch { setModalSellPrice(livePrices[item.stockname] ?? item.currentPrice); }
+                                        setModalPriceFetching(false);
+                                      }}
                                       style={{padding:"7px 14px",border:"1px solid rgba(255,77,109,.35)",borderRadius:9,background:"rgba(255,77,109,.1)",color:"var(--neon3)",fontFamily:"'DM Sans',sans-serif",fontSize:"0.75rem",fontWeight:700,cursor:"pointer",transition:"all 0.2s"}}
                                       onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background="rgba(255,77,109,.22)";}}
                                       onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background="rgba(255,77,109,.1)";}}>
@@ -607,7 +618,9 @@ export default function VirtualTrading() {
             </div>
             <div style={{background:"rgba(255,255,255,.04)",borderRadius:14,padding:16,marginBottom:14}}>
               <div style={{fontSize:"0.68rem",textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--muted)",marginBottom:8}}>Current Price</div>
-              <div style={{fontFamily:"'Syne',sans-serif",fontSize:"1.4rem",fontWeight:800,color:"var(--neon)"}}>${(livePrices[sellModal.stockname]??sellModal.currentPrice).toFixed(2)}</div>
+              <div style={{fontFamily:"'Syne',sans-serif",fontSize:"1.4rem",fontWeight:800,color:"var(--neon)"}}>
+                {modalPriceFetching ? "..." : `$${(modalSellPrice || livePrices[sellModal.stockname] || sellModal.currentPrice).toFixed(2)}`}
+              </div>
             </div>
             <div style={{background:"rgba(255,255,255,.04)",borderRadius:14,padding:16,marginBottom:14}}>
               <div style={{fontSize:"0.68rem",textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--muted)",marginBottom:8}}>You hold</div>
@@ -622,13 +635,13 @@ export default function VirtualTrading() {
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:16,borderRadius:14,background:"linear-gradient(135deg,rgba(255,77,109,.06),rgba(123,97,255,.06))",border:"1px solid rgba(255,255,255,.06)",marginBottom:20}}>
               <span style={{fontSize:"0.85rem",color:"var(--muted)"}}>Proceeds</span>
               <span style={{fontFamily:"'Syne',sans-serif",fontSize:"1.5rem",fontWeight:800,color:"var(--neon3)"}}>
-                ${(sellQty*(livePrices[sellModal.stockname]??sellModal.currentPrice)).toFixed(2)}
+                {modalPriceFetching ? "..." : `$${(sellQty*(modalSellPrice||livePrices[sellModal.stockname]||sellModal.currentPrice)).toFixed(2)}`}
               </span>
             </div>
             <button onClick={confirmTableSell}
-              disabled={submitting}
-              style={{width:"100%",padding:15,border:"none",borderRadius:14,background:"linear-gradient(135deg,#ff4d6d,#7b61ff)",color:"white",fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:"1rem",cursor:submitting?"not-allowed":"pointer",transition:"all .25s",letterSpacing:"0.5px",opacity:submitting?.5:1}}>
-              {submitting ? "Processing…" : "CONFIRM SELL"}
+              disabled={submitting || modalPriceFetching}
+              style={{width:"100%",padding:15,border:"none",borderRadius:14,background:"linear-gradient(135deg,#ff4d6d,#7b61ff)",color:"white",fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:"1rem",cursor:(submitting||modalPriceFetching)?"not-allowed":"pointer",transition:"all .25s",letterSpacing:"0.5px",opacity:(submitting||modalPriceFetching)?.5:1}}>
+              {submitting ? "Processing…" : modalPriceFetching ? "Fetching price…" : "CONFIRM SELL"}
             </button>
           </div>
         </div>

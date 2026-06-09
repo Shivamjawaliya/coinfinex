@@ -53,14 +53,18 @@ export default function Transactions() {
             <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
               {/* Header */}
               <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 0.9fr 1fr", gap:12, padding:"14px 20px", borderBottom:"1px solid var(--border)", background:"rgba(255,255,255,0.03)" }}>
-                {["Date","Stock","Type","Qty","Buy Price","Exec Price","Total"].map(h => (
+                {["Date","Stock","Type","Qty","Buy Price","Sell Price","P&L"].map(h => (
                   <span key={h} style={{ fontSize:"0.7rem", color:"var(--muted)", letterSpacing:"1px", textTransform:"uppercase", fontWeight:600 }}>{h}</span>
                 ))}
               </div>
 
               {txns.map((t, i) => {
-                const total = t.executedPrice * t.quantity;
-                const isBuy = t.orderType === "buy";
+                const isBuy  = t.orderType === "buy";
+                // BUY total = amount spent; SELL total = P&L (sell - buy) × qty
+                const pnl    = isBuy
+                  ? -(t.executedPrice * t.quantity)
+                  : (t.executedPrice - t.targetPrice) * t.quantity;
+                const pnlPos = pnl >= 0;
                 return (
                   <div key={t._id}
                     style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 0.9fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}
@@ -69,18 +73,23 @@ export default function Transactions() {
                   >
                     <span style={{ fontSize:"0.82rem", color:"var(--muted)" }}>{fmtDate(t.executedAt)}</span>
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.92rem" }}>{t.stockname}</span>
-                    <span style={{ padding:"3px 10px", marginRight : "20px", borderRadius:6, fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", textAlign:"center",
+                    <span style={{ padding:"3px 10px", marginRight:"20px", borderRadius:6, fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", textAlign:"center",
                       background: isBuy ? "rgba(0,230,118,0.1)" : "rgba(255,77,109,0.1)",
                       color:       isBuy ? "#00e676"             : "#ff4d6d",
                       border:     `1px solid ${isBuy ? "rgba(0,230,118,0.25)" : "rgba(255,77,109,0.25)"}` }}>
                       {t.orderType}
                     </span>
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
+                    {/* Buy Price */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${t.targetPrice.toFixed(2)}</span>
-                    <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>${t.executedPrice.toFixed(2)}</span>
-                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
-                      color: isBuy ? "#ff4d6d" : t.executedPrice >= t.targetPrice ? "#00e676" : "#ff4d6d" }}>
-                      {isBuy ? "-" : "+"}{total.toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 })}
+                    {/* Sell Price — show "—" for BUY rows */}
+                    <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
+                      {isBuy ? "—" : `$${t.executedPrice.toFixed(2)}`}
+                    </span>
+                    {/* P&L for sells, total spent for buys */}
+                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem", color: isBuy ? "#ff4d6d" : pnlPos ? "#00e676" : "#ff4d6d" }}>
+                      {isBuy ? `-$${(t.executedPrice * t.quantity).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
+                             : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
                     </span>
                   </div>
                 );

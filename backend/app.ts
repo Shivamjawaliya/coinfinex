@@ -6,6 +6,7 @@ import session    from "express-session";
 import { frontendUrl, jwtSecret } from "./config/keys";
 import "./config/passport";
 import ordersRouter from "./routes/orders";
+import wishlistRouter from "./routes/wishlist";
 
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
@@ -42,6 +43,7 @@ app.use("/api/trading", tradingRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api", ordersRouter);
+app.use("/api/wishlist", wishlistRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });

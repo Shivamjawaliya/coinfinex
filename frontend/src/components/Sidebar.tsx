@@ -6,12 +6,14 @@ interface SidebarProps {
   user?: { name?: string; username?: string; initials?: string; role?: string } | null;
 }
 const NAV = [
-  { key: "dashboard", href: "/explore", icon: "⚡", label: "Explore" },
-  { key: "categories", href: "/categories", icon: "📊", label: "Categories" },
+  { key: "dashboard",     href: "/explore",          icon: "⚡", label: "Explore" },
+  { key: "categories",    href: "/categories",        icon: "📊", label: "Categories" },
   { key: "virtual-trading", href: "/virtual-trading", icon: "📦", label: "Virtual Trading" },
-  { key: "intraday", href: "/intraday", icon: "📰", label: "Intraday" },
-  { key: "portfolio", href: "/portfolio", icon: "💼", label: "Portfolio" },
-  { key: "news", href: "/news", icon: "📰", label: "News" },
+  { key: "intraday",      href: "/intraday",          icon: "📰", label: "Intraday" },
+  { key: "portfolio",     href: "/portfolio",         icon: "💼", label: "Portfolio" },
+  { key: "wishlist",      href: "/wishlist",          icon: "♥",  label: "Wishlist" },
+  { key: "transactions",  href: "/transactions",      icon: "🧾", label: "Transactions" },
+  { key: "news",          href: "/news",              icon: "📰", label: "News" },
 ];
 export default function Sidebar({ user, active }: SidebarProps) {
   const { user: authUser, logout } = useAuth();

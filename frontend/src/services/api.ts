@@ -45,4 +45,12 @@ export const getNews = (page = 1) => api.get(`/news?page=${page}`);
 // Categories
 export const getCategories = () => api.get("/categories");
 
+// Wishlist
+export const getWishlist    = ()             => api.get("/wishlist/my");
+export const addWishlist    = (stockname: string) => api.post("/wishlist/add", { stockname });
+export const removeWishlist = (symbol: string)    => api.delete(`/wishlist/remove/${symbol}`);
+
+// Transactions
+export const getTransactions = () => api.get("/transactions");
+
 export default api;

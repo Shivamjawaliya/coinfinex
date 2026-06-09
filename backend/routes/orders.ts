@@ -87,6 +87,17 @@ router.post("/cancel-order/:id", authMiddleware, async (req: Request, res: Respo
   }
 });
 
+// ── Get executed transactions ────────────────────
+router.get("/transactions", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userid = (req as any).user.email;
+    const orders = await Order.find({ userid, status: "executed" }).sort({ executedAt: -1 });
+    res.json({ success: true, transactions: orders });
+  } catch (e: any) {
+    res.status(500).json({ success: false, transactions: [] });
+  }
+});
+
 // ── Get pending orders only ──────────────────────
 router.get("/pending-orders", authMiddleware, async (req: Request, res: Response) => {
   try {

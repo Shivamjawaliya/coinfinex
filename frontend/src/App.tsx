@@ -12,7 +12,9 @@ import News from "./pages/News";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AuthCallback from "./pages/AuthCallback";
-import Intraday from "./pages/Intraday";   
+import Intraday from "./pages/Intraday";
+import Wishlist from "./pages/Wishlist";
+import Transactions from "./pages/Transactions";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -36,7 +38,9 @@ function AppRoutes() {
       <Route path="/virtual-trading" element={<PrivateRoute><VirtualTrading /></PrivateRoute>} />
       <Route path="/portfolio" element={<PrivateRoute><Portfolio /></PrivateRoute>} />
       <Route path="/news" element={<PrivateRoute><News /></PrivateRoute>} />
-      <Route path="/intraday" element={<PrivateRoute><Intraday /></PrivateRoute>} /> 
+      <Route path="/intraday"      element={<PrivateRoute><Intraday /></PrivateRoute>} />
+      <Route path="/wishlist"      element={<PrivateRoute><Wishlist /></PrivateRoute>} />
+      <Route path="/transactions"  element={<PrivateRoute><Transactions /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

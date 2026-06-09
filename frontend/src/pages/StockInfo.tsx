@@ -5,7 +5,7 @@ import {
   PointElement, LineElement, Filler, Tooltip, Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { getStock, buyStock, getStockPrice } from "../services/api";
+import { getStock, buyStock, getStockPrice, getWishlist, addWishlist, removeWishlist } from "../services/api";
 import Sidebar from "../components/Sidebar";
 import type { StockQuote, StockOverview, HistoryPoint, NewsItem } from "../types";
 
@@ -64,7 +64,7 @@ export default function StockInfo() {
   const [toast, setToast]       = useState<{ msg:string; ok:boolean } | null>(null);
   const [watchlisted, setWatchlisted] = useState(false);
 
-  /* ── load stock data ────────────────────────────────── */
+  /* ── load stock data + wishlist state ──────────────── */
   useEffect(() => {
     if (!symbol) return;
     setLoading(true);
@@ -72,7 +72,21 @@ export default function StockInfo() {
       .then(r => setData(r.data))
       .catch(() => navigate("/explore"))
       .finally(() => setLoading(false));
+    getWishlist()
+      .then(r => setWatchlisted((r.data.wishlist as string[]).includes(symbol.toUpperCase())))
+      .catch(() => {});
   }, [symbol, navigate]);
+
+  const toggleWishlist = async () => {
+    if (!symbol) return;
+    const next = !watchlisted;
+    setWatchlisted(next);
+    try {
+      next ? await addWishlist(symbol) : await removeWishlist(symbol);
+    } catch {
+      setWatchlisted(!next);
+    }
+  };
 
   /* ── live price poll ────────────────────────────────── */
   useEffect(() => {
@@ -288,7 +302,7 @@ export default function StockInfo() {
                   onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.transform="";(e.currentTarget as HTMLButtonElement).style.boxShadow="";}}>
                   Buy {symbol}
                 </button>
-                <button onClick={()=>setWatchlisted(w=>!w)}
+                <button onClick={toggleWishlist}
                   style={{padding:"14px 20px",borderRadius:12,border:`1px solid ${watchlisted?"rgba(0,230,118,.4)":"rgba(123,97,255,.4)"}`,background:watchlisted?"rgba(0,230,118,.08)":"rgba(123,97,255,.08)",color:watchlisted?"#00e676":"var(--neon2)",fontFamily:"'DM Sans',sans-serif",fontSize:"0.85rem",fontWeight:600,cursor:"pointer",transition:"all .3s",whiteSpace:"nowrap"}}>
                   {watchlisted?"♥  Watching":"♡  Watchlist"}
                 </button>

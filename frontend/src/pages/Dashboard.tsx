@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDashboard, getStockPrice } from "../services/api";
+import { getDashboard, getStockPrice, getWishlist, addWishlist, removeWishlist } from "../services/api";
 import Sidebar from "../components/Sidebar";
 
 /* ── Types ─────────────────────────────────────────────── */
@@ -108,11 +108,24 @@ export default function Dashboard() {
   const [currency, setCurrency]   = useState("INR");
   const [page, setPage]           = useState(1);
   const [livePrices, setLivePrices] = useState<Record<string,number>>({});
+  const [wished, setWished]         = useState<Set<string>>(new Set());
 
-  /* ── Load user ────────────────────────────────────────── */
+  /* ── Load user + wishlist ─────────────────────────────── */
   useEffect(() => {
     getDashboard().then(r => setDashUser(r.data.user)).catch(() => {});
+    getWishlist().then(r => setWished(new Set(r.data.wishlist))).catch(() => {});
   }, []);
+
+  const toggleWish = async (e: React.MouseEvent, symbol: string) => {
+    e.stopPropagation();
+    const isIn = wished.has(symbol);
+    setWished(prev => { const s = new Set(prev); isIn ? s.delete(symbol) : s.add(symbol); return s; });
+    try {
+      isIn ? await removeWishlist(symbol) : await addWishlist(symbol);
+    } catch {
+      setWished(prev => { const s = new Set(prev); isIn ? s.add(symbol) : s.delete(symbol); return s; });
+    }
+  };
 
   /* ── Fetch live prices for top stocks ─────────────────── */
   useEffect(() => {
@@ -329,6 +342,13 @@ export default function Dashboard() {
                     <div style={{ fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"0.98rem" }}>{s.symbol}</div>
                     <div style={{ color:"var(--muted)",fontSize:"0.7rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{s.name.toUpperCase()}</div>
                   </div>
+                  <button onClick={e => toggleWish(e, s.symbol)}
+                    style={{ background:"none",border:"none",cursor:"pointer",fontSize:"1.1rem",lineHeight:1,padding:"2px 4px",color:wished.has(s.symbol)?"#ff4d6d":"var(--muted)",transition:"color 0.2s,transform 0.15s",flexShrink:0 }}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.transform="scale(1.25)";}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.transform="";}}
+                    title={wished.has(s.symbol)?"Remove from wishlist":"Add to wishlist"}>
+                    {wished.has(s.symbol) ? "♥" : "♡"}
+                  </button>
                 </div>
 
                 {/* Price */}

@@ -88,14 +88,12 @@ export default function Transactions() {
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
                       {isBuy || !hasRealPnl ? "—" : `$${t.executedPrice.toFixed(2)}`}
                     </span>
-                    {/* P&L: buy = total spent; sell = price diff × qty; old records = "—" */}
+                    {/* P&L: buy = not applicable yet; sell = price diff × qty; old records = "—" */}
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
-                      color: isBuy ? "#ff4d6d" : hasRealPnl ? (pnlPos ? "#00e676" : "#ff4d6d") : "var(--muted)" }}>
-                      {isBuy
-                        ? `-$${(t.executedPrice * t.quantity).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
-                        : hasRealPnl
-                          ? `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
-                          : "—"}
+                      color: hasRealPnl ? (pnlPos ? "#00e676" : "#ff4d6d") : "var(--muted)" }}>
+                      {hasRealPnl
+                        ? `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
+                        : "—"}
                     </span>
                   </div>
                 );

@@ -69,7 +69,7 @@ export default function Transactions() {
                   >
                     <span style={{ fontSize:"0.82rem", color:"var(--muted)" }}>{fmtDate(t.executedAt)}</span>
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.92rem" }}>{t.stockname}</span>
-                    <span style={{ padding:"3px 10px", borderRadius:6, fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", textAlign:"center",
+                    <span style={{ padding:"3px 10px", marginRight : "20px", borderRadius:6, fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", textAlign:"center",
                       background: isBuy ? "rgba(0,230,118,0.1)" : "rgba(255,77,109,0.1)",
                       color:       isBuy ? "#00e676"             : "#ff4d6d",
                       border:     `1px solid ${isBuy ? "rgba(0,230,118,0.25)" : "rgba(255,77,109,0.25)"}` }}>
@@ -77,8 +77,9 @@ export default function Transactions() {
                     </span>
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>${t.executedPrice.toFixed(2)}</span>
-                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem", color: isBuy ? "#ff4d6d" : "#00e676" }}>
-                      {isBuy ? "-" : "+"}${total.toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 })}
+                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
+                      color: isBuy ? "#ff4d6d" : t.executedPrice >= t.targetPrice ? "#00e676" : "#ff4d6d" }}>
+                      {isBuy ? "-" : "+"}{total.toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 })}
                     </span>
                   </div>
                 );

@@ -96,10 +96,10 @@ export default function Intraday() {
     if (!livePrice) { showNotif("No live price available", "error"); return; }
 
     try {
-      const url  = buyType === "buy" ? `${API_BASE}/api/buy-stock` : `${API_BASE}/api/sell-stock`;
+      const url  = buyType === "buy" ? `${API_BASE}/api/trading/buy` : `${API_BASE}/api/trading/sell`;
       const body = buyType === "buy"
         ? { stockname: symbol, stockquantity: buyQty, stockbuyprice: livePrice }
-        : { stockname: symbol, stockquantity: buyQty };
+        : { stockname: symbol, stockquantity: buyQty, stocksellprice: livePrice };
 
       const r = await fetch(url, {
         method:      "POST",

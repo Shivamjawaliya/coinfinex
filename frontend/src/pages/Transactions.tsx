@@ -60,10 +60,7 @@ export default function Transactions() {
               </div>
 
               {txns.map((t, i) => {
-                const isBuy    = t.orderType === "buy";
-                const buyPrice = t.buyPrice ?? t.targetPrice;
-                const pnl      = (t.executedPrice - buyPrice) * t.quantity;
-                const pnlPos   = pnl >= 0;
+                const isBuy = t.orderType === "buy";
                 return (
                   <div key={t._id}
                     style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}

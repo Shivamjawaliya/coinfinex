@@ -54,7 +54,9 @@ export default function Portfolio() {
     setLoading(true);
     getPortfolio()
       .then(r => setData(r.data))
-      .catch(() => {})
+      .catch(err => {
+        if (err?.response?.status === 401) window.location.href = "/login";
+      })
       .finally(() => setLoading(false));
   }, []);
   useEffect(() => { load(); }, [load]);

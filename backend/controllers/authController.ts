@@ -24,6 +24,8 @@ function getTransporter() {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_PASS,
     },
+    connectionTimeout: 8000,
+    greetingTimeout:   8000,
   });
 }
 

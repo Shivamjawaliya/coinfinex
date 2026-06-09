@@ -19,13 +19,15 @@ const cookieOptions = {
 
 function getTransporter() {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_PASS,
     },
-    connectionTimeout: 8000,
-    greetingTimeout:   8000,
+    connectionTimeout: 10000,
+    greetingTimeout:   10000,
   });
 }
 
@@ -114,9 +116,9 @@ export const sendOtp = async (req: Request, res: Response): Promise<void> => {
   try {
     await sendEmail(email, "Your Coinfinex verification code", otpEmailHtml(otp));
     res.json({ message: "OTP sent" });
-  } catch (err) {
-    console.error("Email send failed:", err);
-    res.status(500).json({ message: "Failed to send OTP. Check server email config." });
+  } catch (err: any) {
+    console.error("Email send failed:", err?.message || err);
+    res.status(500).json({ message: `Failed to send OTP: ${err?.message || "unknown error"}` });
   }
 };
 

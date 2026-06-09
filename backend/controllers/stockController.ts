@@ -1,10 +1,21 @@
 import { Request, Response } from "express";
 import { yahooFinance, yahooNews } from "../utils/helpers";
 
+// Resolve symbol — try raw first, then ${raw}-USD for crypto
+async function resolveSymbol(raw: string): Promise<string> {
+  try {
+    await (yahooFinance as any).quote(raw);
+    return raw;
+  } catch {
+    return `${raw}-USD`;
+  }
+}
+
 // GET /api/stocks/:symbol
 export const stockDetail = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = String(req.params.symbol || req.params.id || "").toUpperCase();
+    const raw = String(req.params.symbol || req.params.id || "").toUpperCase();
+    const id  = await resolveSymbol(raw);
 
     const summary = await (yahooFinance as any).quoteSummary(id, {
       modules: ["price", "summaryDetail", "assetProfile", "financialData", "defaultKeyStatistics"],
@@ -85,8 +96,9 @@ export const stockDetail = async (req: Request, res: Response): Promise<void> =>
 // GET /api/stocks/:symbol/price
 export const stockPrice = async (req: Request, res: Response): Promise<void> => {
   try {
-    const symbol = req.params.symbol;
-    const quote = await (yahooFinance as any).quote(symbol);
+    const raw    = String(req.params.symbol).toUpperCase();
+    const symbol = await resolveSymbol(raw);
+    const quote  = await (yahooFinance as any).quote(symbol);
     const price: number = quote.regularMarketPrice || 0;
     res.json({ success: true, price });
   } catch {

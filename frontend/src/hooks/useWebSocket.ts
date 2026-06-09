@@ -54,7 +54,9 @@ export function useWebSocket(symbol: string | null): UseWebSocketReturn {
         wsRef.current = null;
       }
 
-      const backendHost = import.meta.env.VITE_BACKEND_WS_URL || "ws://localhost:5001";
+      const apiUrl      = import.meta.env.VITE_API_URL as string | undefined;
+      const backendHost = import.meta.env.VITE_BACKEND_WS_URL
+        || (apiUrl ? apiUrl.replace(/^http/, "ws") : "ws://localhost:5001");
       const url         = `${backendHost}?symbol=${symbol}`;
 
       console.log(`🔌 Connecting to ${url}`);

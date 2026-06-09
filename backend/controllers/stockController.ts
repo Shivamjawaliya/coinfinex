@@ -1,21 +1,17 @@
 import { Request, Response } from "express";
 import { yahooFinance, yahooNews } from "../utils/helpers";
 
-// Resolve symbol — try raw first, then ${raw}-USD for crypto
-async function resolveSymbol(raw: string): Promise<string> {
-  try {
-    await (yahooFinance as any).quote(raw);
-    return raw;
-  } catch {
-    return `${raw}-USD`;
-  }
+const CRYPTO = new Set(["BTC","ETH","SOL","BNB","XRP","AVAX","DOGE","ADA","MATIC","DOT","LTC","BCH","LINK","UNI"]);
+
+function resolveSymbol(raw: string): string {
+  return CRYPTO.has(raw) ? `${raw}-USD` : raw;
 }
 
 // GET /api/stocks/:symbol
 export const stockDetail = async (req: Request, res: Response): Promise<void> => {
   try {
     const raw = String(req.params.symbol || req.params.id || "").toUpperCase();
-    const id  = await resolveSymbol(raw);
+    const id  = resolveSymbol(raw);
 
     const summary = await (yahooFinance as any).quoteSummary(id, {
       modules: ["price", "summaryDetail", "assetProfile", "financialData", "defaultKeyStatistics"],
@@ -97,7 +93,7 @@ export const stockDetail = async (req: Request, res: Response): Promise<void> =>
 export const stockPrice = async (req: Request, res: Response): Promise<void> => {
   try {
     const raw    = String(req.params.symbol).toUpperCase();
-    const symbol = await resolveSymbol(raw);
+    const symbol = resolveSymbol(raw);
     const quote  = await (yahooFinance as any).quote(symbol);
     const price: number = quote.regularMarketPrice || 0;
     res.json({ success: true, price });

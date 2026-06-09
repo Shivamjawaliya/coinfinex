@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useWebSocket } from "../hooks/useWebSocket";
 import CandleChart from "../components/CandleChart";
 import Sidebar from "../components/Sidebar";
+import { API_BASE } from "../services/api";
 
 const STOCKS = [
   { sym: "AAPL", name: "Apple Inc" },
@@ -124,7 +125,7 @@ export default function Intraday() {
     if (!schedTarget) { showNotif("Enter target price", "error");   return; }
 
     try {
-      const r = await fetch("/api/place-order", {
+      const r = await fetch(`${API_BASE}/api/place-order`, {
         method:      "POST",
         headers:     { "Content-Type": "application/json" },
         credentials: "include",

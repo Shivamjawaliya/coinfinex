@@ -17,11 +17,21 @@ export const stockDetail = async (req: Request, res: Response): Promise<void> =>
       modules: ["price", "summaryDetail", "assetProfile", "financialData", "defaultKeyStatistics"],
     });
 
-    const chartData = await (yahooFinance as any).chart(id, {
-      period1: new Date("2024-01-01"),
-      period2: new Date(),
-      interval: "1d",
-    });
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const [chartData, intradayData] = await Promise.all([
+      (yahooFinance as any).chart(id, {
+        period1: new Date("2024-01-01"),
+        period2: now,
+        interval: "1d",
+      }),
+      (yahooFinance as any).chart(id, {
+        period1: yesterday,
+        period2: now,
+        interval: "5m",
+      }).catch(() => null),
+    ]);
 
     const price = summary.price || {};
     const detail = summary.summaryDetail || {};
@@ -75,6 +85,14 @@ export const stockDetail = async (req: Request, res: Response): Promise<void> =>
         volume: q.volume,
       })) || [];
 
+    const intradayHistory: object[] =
+      intradayData?.quotes
+        ?.filter((q: any) => q.close != null)
+        .map((q: any) => ({
+          date: q.date,
+          close: q.close,
+        })) || [];
+
     let news: object[] = [];
     try {
       news = await yahooNews(id);
@@ -82,7 +100,7 @@ export const stockDetail = async (req: Request, res: Response): Promise<void> =>
       console.warn("News fetch failed (non-fatal):", newsErr.message);
     }
 
-    res.json({ symbol: id, quote, overview, history, news });
+    res.json({ symbol: id, quote, overview, history, intradayHistory, news });
   } catch (err) {
     console.error("Stock route error:", err);
     res.status(500).json({ message: "Failed to load stock data" });

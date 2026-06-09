@@ -11,11 +11,14 @@ import type { StockQuote, StockOverview, HistoryPoint, NewsItem } from "../types
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
+interface IntradayPoint { date: string; close: number; }
+
 interface StockData {
   symbol: string;
   quote: StockQuote;
   overview: StockOverview;
   history: HistoryPoint[];
+  intradayHistory: IntradayPoint[];
   news: NewsItem[];
 }
 
@@ -121,7 +124,21 @@ export default function StockInfo() {
 
   /* ── chart data ─────────────────────────────────────── */
   const chartDataset = useMemo(() => {
-    if (!data?.history.length) return null;
+    if (!data) return null;
+
+    if (range === 1) {
+      const pts = data.intradayHistory ?? [];
+      if (!pts.length) return null;
+      const prices = pts.map(h => h.close);
+      const labels = pts.map(h => {
+        const d = new Date(h.date);
+        return d.toLocaleTimeString("en-US", { hour:"2-digit", minute:"2-digit", hour12: false });
+      });
+      const up = prices.length < 2 || prices[prices.length-1] >= prices[0];
+      return { prices, labels, color: up ? "#00f5c4" : "#ff4d6d" };
+    }
+
+    if (!data.history.length) return null;
     const slice = range >= 9999
       ? [...data.history].reverse()
       : [...data.history].slice(0, range).reverse();
@@ -131,8 +148,7 @@ export default function StockInfo() {
       return d.toLocaleDateString("en-US", { month:"short", day:"numeric" });
     });
     const up = prices.length < 2 || prices[prices.length-1] >= prices[0];
-    const color = up ? "#00f5c4" : "#ff4d6d";
-    return { prices, labels, color };
+    return { prices, labels, color: up ? "#00f5c4" : "#ff4d6d" };
   }, [data, range]);
 
   const buildChartData = useCallback(() => {

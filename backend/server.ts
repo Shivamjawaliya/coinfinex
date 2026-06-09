@@ -68,8 +68,15 @@ export function broadcastCandle(sym: string, candle: object, isNew: boolean) {
 // ── Finnhub WebSocket ────────────────────────────
 const subscribedSymbols = new Set<string>();
 let finnhubWs: WebSocket;
+let finnhubAuthFailed = false;
 
 function connectFinnhub() {
+  if (!FINNHUB_KEY) {
+    console.warn("⚠️ FINNHUB_KEY not set — live ticks disabled, using Yahoo Finance polling only");
+    return;
+  }
+  if (finnhubAuthFailed) return;
+
   finnhubWs = new WebSocket(`wss://ws.finnhub.io?token=${FINNHUB_KEY}`);
 
   finnhubWs.on("open", () => {
@@ -92,12 +99,18 @@ function connectFinnhub() {
   });
 
   finnhubWs.on("close", () => {
+    if (finnhubAuthFailed) return;
     console.warn("⚠️ Finnhub disconnected — reconnecting in 3s");
     setTimeout(connectFinnhub, 3000);
   });
 
   finnhubWs.on("error", (err) => {
-    console.error("Finnhub error:", err.message);
+    if (err.message.includes("401")) {
+      finnhubAuthFailed = true;
+      console.warn("⚠️ Finnhub auth failed (401) — invalid API key. Live ticks disabled; Yahoo Finance polling will handle order execution.");
+    } else {
+      console.error("Finnhub error:", err.message);
+    }
   });
 }
 

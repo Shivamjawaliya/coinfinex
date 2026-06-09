@@ -53,8 +53,8 @@ export default function Transactions() {
           ) : (
             <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
               {/* Header */}
-              <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 1fr 1fr", gap:12, padding:"14px 20px", borderBottom:"1px solid var(--border)", background:"rgba(255,255,255,0.03)" }}>
-                {["Date","Stock","Type","Qty","Price","P&L"].map(h => (
+              <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 1fr", gap:12, padding:"14px 20px", borderBottom:"1px solid var(--border)", background:"rgba(255,255,255,0.03)" }}>
+                {["Date","Stock","Type","Qty","Price"].map(h => (
                   <span key={h} style={{ fontSize:"0.7rem", color:"var(--muted)", letterSpacing:"1px", textTransform:"uppercase", fontWeight:600 }}>{h}</span>
                 ))}
               </div>
@@ -66,7 +66,7 @@ export default function Transactions() {
                 const pnlPos   = pnl >= 0;
                 return (
                   <div key={t._id}
-                    style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 1fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}
+                    style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}
                     onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background="rgba(255,255,255,0.025)"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background=""; }}
                   >
@@ -82,11 +82,6 @@ export default function Transactions() {
                     {/* Executed price — real-time price at moment of trade */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
                       ${t.executedPrice.toFixed(2)}
-                    </span>
-                    {/* P&L — "—" for BUY; profit/loss for SELL */}
-                    <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
-                      color: isBuy ? "var(--muted)" : pnlPos ? "#00e676" : "#ff4d6d" }}>
-                      {isBuy ? "—" : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
                     </span>
                   </div>
                 );

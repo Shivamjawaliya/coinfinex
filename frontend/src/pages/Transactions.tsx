@@ -52,8 +52,8 @@ export default function Transactions() {
           ) : (
             <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
               {/* Header */}
-              <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 1fr", gap:12, padding:"14px 20px", borderBottom:"1px solid var(--border)", background:"rgba(255,255,255,0.03)" }}>
-                {["Date","Stock","Type","Qty","Price","Total"].map(h => (
+              <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 0.9fr 1fr", gap:12, padding:"14px 20px", borderBottom:"1px solid var(--border)", background:"rgba(255,255,255,0.03)" }}>
+                {["Date","Stock","Type","Qty","Buy Price","Exec Price","Total"].map(h => (
                   <span key={h} style={{ fontSize:"0.7rem", color:"var(--muted)", letterSpacing:"1px", textTransform:"uppercase", fontWeight:600 }}>{h}</span>
                 ))}
               </div>
@@ -63,7 +63,7 @@ export default function Transactions() {
                 const isBuy = t.orderType === "buy";
                 return (
                   <div key={t._id}
-                    style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}
+                    style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 0.7fr 0.7fr 0.9fr 0.9fr 1fr", gap:12, padding:"16px 20px", borderBottom: i < txns.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", alignItems:"center", transition:"background 0.2s" }}
                     onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background="rgba(255,255,255,0.025)"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background=""; }}
                   >
@@ -76,6 +76,7 @@ export default function Transactions() {
                       {t.orderType}
                     </span>
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
+                    <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${t.targetPrice.toFixed(2)}</span>
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>${t.executedPrice.toFixed(2)}</span>
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
                       color: isBuy ? "#ff4d6d" : t.executedPrice >= t.targetPrice ? "#00e676" : "#ff4d6d" }}>

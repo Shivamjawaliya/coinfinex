@@ -59,13 +59,8 @@ export default function Transactions() {
               </div>
 
               {txns.map((t, i) => {
-                const isBuy = t.orderType === "buy";
-                // old sell records have targetPrice = executedPrice (sell price stored in both fields)
-                // new records have targetPrice = buy price, executedPrice = actual sell price
-                const hasRealPnl = !isBuy && t.executedPrice !== t.targetPrice;
-                const pnl    = isBuy
-                  ? -(t.executedPrice * t.quantity)
-                  : (t.executedPrice - t.targetPrice) * t.quantity;
+                const isBuy  = t.orderType === "buy";
+                const pnl    = (t.executedPrice - t.targetPrice) * t.quantity;
                 const pnlPos = pnl >= 0;
                 return (
                   <div key={t._id}
@@ -84,16 +79,14 @@ export default function Transactions() {
                     <span style={{ fontSize:"0.9rem", fontWeight:600 }}>{t.quantity}</span>
                     {/* Buy Price */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--muted)" }}>${t.targetPrice.toFixed(2)}</span>
-                    {/* Sell Price — "—" for BUY; for old SELL records where both prices equal, show "—" */}
+                    {/* Sell Price — "—" for BUY rows */}
                     <span style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--neon)" }}>
-                      {isBuy || !hasRealPnl ? "—" : `$${t.executedPrice.toFixed(2)}`}
+                      {isBuy ? "—" : `$${t.executedPrice.toFixed(2)}`}
                     </span>
-                    {/* P&L: buy = not applicable yet; sell = price diff × qty; old records = "—" */}
+                    {/* P&L — "—" for BUY, profit/loss for SELL */}
                     <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:"0.95rem",
-                      color: hasRealPnl ? (pnlPos ? "#00e676" : "#ff4d6d") : "var(--muted)" }}>
-                      {hasRealPnl
-                        ? `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`
-                        : "—"}
+                      color: isBuy ? "var(--muted)" : pnlPos ? "#00e676" : "#ff4d6d" }}>
+                      {isBuy ? "—" : `${pnlPos?"+":"-"}$${Math.abs(pnl).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
                     </span>
                   </div>
                 );

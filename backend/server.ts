@@ -13,7 +13,7 @@ import app from "./app";
 import { connectDB } from "./config/db";
 import { port, FINNHUB_KEY } from "./config/keys";
 import { updateCandle, getCandleData } from "./utils/candleBuilder";
-import { checkAndExecuteOrders } from "./utils/orderExecutor";
+import { checkAndExecuteOrders, checkOrdersForSymbol } from "./utils/orderExecutor";
 
 // ── HTTP server ──────────────────────────────────
 const server = http.createServer(app);
@@ -86,6 +86,7 @@ function connectFinnhub() {
       msg.data.forEach((trade: { s: string; p: number; v: number }) => {
         const { candle, isNew } = updateCandle(trade.s, trade.p, trade.v || 0);
         broadcastCandle(trade.s, candle, isNew);
+        checkOrdersForSymbol(trade.s, trade.p);
       });
     } catch (e) { console.error("Finnhub parse error:", e); }
   });
@@ -112,6 +113,7 @@ function subscribeFinnhub(symbol: string) {
 // ── Start ────────────────────────────────────────
 connectDB().then(() => {
   connectFinnhub();
+  checkAndExecuteOrders();
   setInterval(checkAndExecuteOrders, 2 * 60 * 1000);
   console.log("📊 Order executor started — every 2 min");
   server.listen(port, () => {

@@ -2,7 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import passport from "passport";
-import { frontendUrl } from "./config/keys";
+import session    from "express-session";  
+import { frontendUrl, jwtSecret } from "./config/keys";
 import "./config/passport";
 import ordersRouter from "./routes/orders";
 
@@ -24,6 +25,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// ── Add this before passport.initialize() ────────
+app.use(session({
+  secret:            jwtSecret as string,
+  resave:            false,
+  saveUninitialized: false,
+}));
+
 app.use(passport.initialize());
 
 app.use("/api/auth", authRoutes);

@@ -176,10 +176,10 @@ export default function Intraday() {
     : null;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#03040a", color: "#f0f0f0", fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ display: "flex", width: "100%", minHeight: "100vh", background: "#03040a", color: "#f0f0f0", fontFamily: "'DM Sans', sans-serif" }}>
       <Sidebar />
 
-      <div style={{ flex: 1, marginLeft: "240px" }}>
+      <div style={{ flex: 1, minWidth: 0, marginLeft: "240px", overflow: "hidden" }}>
 
         {/* Topbar */}
         <div style={{ position: "sticky", top: 0, zIndex: 40, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 32px", background: "rgba(3,4,10,0.88)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
@@ -196,7 +196,7 @@ export default function Intraday() {
           </div>
         </div>
 
-        <div style={{ padding: "28px 32px 60px" }}>
+        <div style={{ padding: "28px 32px 60px", width: "100%", boxSizing: "border-box" }}>
 
           {/* ── Search ── */}
           <div style={{ marginBottom: 24 }}>
@@ -246,7 +246,7 @@ export default function Intraday() {
 
           {/* ── Stats Bar ── */}
           {symbol && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12, marginBottom: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12, marginBottom: 20, width: "100%" }}>
               {[
                 { label: "Symbol",    value: symbol,                                  color: "#00f5c4" },
                 { label: "Price",     value: livePrice ? `$${livePrice.toFixed(2)}` : "—", color: "#00f5c4" },
@@ -263,36 +263,92 @@ export default function Intraday() {
             </div>
           )}
 
-          {/* ── Candlestick Chart ── */}
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24, marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.4rem", fontWeight: 800 }}>
-                    {symbol || "Select a stock"}
-                  </span>
-                  {livePrice > 0 && (
-                    <>
-                      <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#00f5c4" }}>
-                        ${livePrice.toFixed(2)}
-                      </span>
-                      <span style={{ fontSize: "0.85rem", fontWeight: 600, color: isUp ? "#00e676" : "#ff6b6b" }}>
-                        {isUp ? "▲" : "▼"} {Math.abs(change).toFixed(2)} ({changePct}%)
-                      </span>
-                    </>
-                  )}
-                </div>
-                <div style={{ fontSize: "0.75rem", color: "rgba(240,240,240,0.4)", marginTop: 4 }}>
-                  {isConnected ? `⚡ Live WebSocket · ${candles.length} candles` : error || "Connecting..."}
+          {/* ── Chart + Orders side by side ── */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 420px", gap: 16, marginBottom: 20, alignItems: "start", width: "100%" }}>
+
+            {/* Candlestick Chart */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.4rem", fontWeight: 800 }}>
+                      {symbol || "Select a stock"}
+                    </span>
+                    {livePrice > 0 && (
+                      <>
+                        <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#00f5c4" }}>
+                          ${livePrice.toFixed(2)}
+                        </span>
+                        <span style={{ fontSize: "0.85rem", fontWeight: 600, color: isUp ? "#00e676" : "#ff6b6b" }}>
+                          {isUp ? "▲" : "▼"} {Math.abs(change).toFixed(2)} ({changePct}%)
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "rgba(240,240,240,0.4)", marginTop: 4 }}>
+                    {isConnected ? `⚡ Live WebSocket · ${candles.length} candles` : error || "Connecting..."}
+                  </div>
                 </div>
               </div>
+
+              <CandleChart candles={candles} symbol={symbol || ""} height={420} />
             </div>
 
-            <CandleChart candles={candles} symbol={symbol || ""} height={420} />
+            {/* Scheduled Orders — right of chart */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+                <div>
+                  <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "1rem", fontWeight: 800 }}>Scheduled Orders</div>
+                  <div style={{ fontSize: "0.78rem", color: "rgba(240,240,240,0.5)", marginTop: 2 }}>Auto-execute when target price is hit</div>
+                </div>
+                <button onClick={loadOrders}
+                  style={{ padding: "6px 14px", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, background: "transparent", color: "rgba(240,240,240,0.5)", fontFamily: "'DM Sans', sans-serif", fontSize: "0.78rem", cursor: "pointer" }}>
+                  ↻ Refresh
+                </button>
+              </div>
+
+              {orders.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 40, color: "rgba(240,240,240,0.4)" }}>
+                  <div style={{ fontSize: "2.5rem", marginBottom: 10 }}>📋</div>
+                  <div>No orders yet</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 460, overflowY: "auto" }}>
+                  {orders.map((o) => (
+                    <div key={o._id} style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, color: "#00f5c4", fontSize: "0.95rem" }}>{o.stockname}</span>
+                          <span style={{ padding: "2px 8px", borderRadius: 999, background: o.orderType === "buy" ? "rgba(0,230,118,0.1)" : "rgba(255,107,107,0.1)", color: o.orderType === "buy" ? "#00e676" : "#ff6b6b", fontSize: "0.68rem", fontWeight: 700 }}>
+                            {o.orderType.toUpperCase()}
+                          </span>
+                        </div>
+                        <span style={{ padding: "2px 8px", borderRadius: 999, background: o.status === "executed" ? "rgba(0,245,196,0.12)" : o.status === "pending" ? "rgba(255,184,0,0.12)" : "rgba(255,255,255,0.06)", color: o.status === "executed" ? "#00f5c4" : o.status === "pending" ? "#ffb800" : "#94a3b8", fontSize: "0.68rem", fontWeight: 700 }}>
+                          {o.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", color: "rgba(240,240,240,0.6)", marginBottom: 8 }}>
+                        <span>Target <strong style={{ color: "#f0f0f0" }}>${o.targetPrice}</strong></span>
+                        <span>Qty <strong style={{ color: "#f0f0f0" }}>{o.quantity}</strong></span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "0.7rem", color: "rgba(240,240,240,0.4)" }}>{new Date(o.createdAt).toLocaleString()}</span>
+                        {o.status === "pending" && (
+                          <button onClick={() => cancelOrder(o._id)}
+                            style={{ padding: "3px 10px", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 6, background: "rgba(255,107,107,0.08)", color: "#ff6b6b", fontSize: "0.7rem", cursor: "pointer" }}>
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* ── Trade Panels ── */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20, width: "100%" }}>
 
             {/* Buy Now */}
             <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24 }}>
@@ -402,66 +458,6 @@ export default function Intraday() {
             </div>
           </div>
 
-          {/* ── Orders Table ── */}
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-              <div>
-                <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "1rem", fontWeight: 800 }}>Scheduled Orders</div>
-                <div style={{ fontSize: "0.78rem", color: "rgba(240,240,240,0.5)", marginTop: 2 }}>Auto-execute when target price is hit</div>
-              </div>
-              <button onClick={loadOrders}
-                style={{ padding: "6px 14px", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, background: "transparent", color: "rgba(240,240,240,0.5)", fontFamily: "'DM Sans', sans-serif", fontSize: "0.78rem", cursor: "pointer" }}>
-                ↻ Refresh
-              </button>
-            </div>
-
-            {orders.length === 0 ? (
-              <div style={{ textAlign: "center", padding: 40, color: "rgba(240,240,240,0.4)" }}>
-                <div style={{ fontSize: "2.5rem", marginBottom: 10 }}>📋</div>
-                <div>No orders yet</div>
-              </div>
-            ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.83rem" }}>
-                <thead>
-                  <tr>
-                    {["Symbol","Type","Target","Qty","Status","Created","Action"].map((h) => (
-                      <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(240,240,240,0.5)", borderBottom: "1px solid rgba(255,255,255,0.07)", fontWeight: 500 }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((o) => (
-                    <tr key={o._id}>
-                      <td style={{ padding: "12px", fontFamily: "'Syne', sans-serif", fontWeight: 800, color: "#00f5c4" }}>{o.stockname}</td>
-                      <td style={{ padding: "12px" }}>
-                        <span style={{ padding: "2px 9px", borderRadius: 999, background: o.orderType === "buy" ? "rgba(0,230,118,0.1)" : "rgba(255,107,107,0.1)", color: o.orderType === "buy" ? "#00e676" : "#ff6b6b", fontSize: "0.7rem", fontWeight: 700 }}>
-                          {o.orderType.toUpperCase()}
-                        </span>
-                      </td>
-                      <td style={{ padding: "12px", fontWeight: 600 }}>${o.targetPrice}</td>
-                      <td style={{ padding: "12px" }}>{o.quantity}</td>
-                      <td style={{ padding: "12px" }}>
-                        <span style={{ padding: "2px 9px", borderRadius: 999, background: o.status === "executed" ? "rgba(0,245,196,0.12)" : o.status === "pending" ? "rgba(255,184,0,0.12)" : "rgba(255,255,255,0.06)", color: o.status === "executed" ? "#00f5c4" : o.status === "pending" ? "#ffb800" : "#94a3b8", fontSize: "0.7rem", fontWeight: 700 }}>
-                          {o.status.toUpperCase()}
-                        </span>
-                      </td>
-                      <td style={{ padding: "12px", fontSize: "0.75rem", color: "rgba(240,240,240,0.5)" }}>
-                        {new Date(o.createdAt).toLocaleString()}
-                      </td>
-                      <td style={{ padding: "12px" }}>
-                        {o.status === "pending" && (
-                          <button onClick={() => cancelOrder(o._id)}
-                            style={{ padding: "4px 10px", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 6, background: "rgba(255,107,107,0.08)", color: "#ff6b6b", fontSize: "0.72rem", cursor: "pointer" }}>
-                            Cancel
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
 
         </div>
       </div>

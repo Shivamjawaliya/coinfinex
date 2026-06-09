@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import Order from "../models/Order";
+import Stock from "../models/userStocksSchema";
+import User from "../models/userModel";
 import { auth as authMiddleware } from "../middleware/auth";
 
 const router = Router();
@@ -14,15 +16,40 @@ router.post("/place-order", authMiddleware, async (req: Request, res: Response) 
       return res.status(400).json({ success: false, message: "All fields required" });
     }
 
+    const qty   = parseInt(quantity);
+    const price = parseFloat(targetPrice);
+    const sym   = (stockname as string).toUpperCase();
+
+    if (orderType === "buy") {
+      const user = await User.findOne({ username: userid });
+      if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+      const cost = price * qty;
+      if (user.balance < cost) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient balance. Need ₹${cost.toFixed(2)}, available ₹${user.balance.toFixed(2)}`,
+        });
+      }
+    } else if (orderType === "sell") {
+      const holding = await Stock.findOne({ userid, stockname: sym });
+      if (!holding || holding.stockquantity < qty) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient shares. You have ${holding?.stockquantity ?? 0}, requested ${qty}`,
+        });
+      }
+    }
+
     const order = await Order.create({
       userid,
-      stockname:   stockname.toUpperCase(),
+      stockname:   sym,
       orderType,
-      targetPrice: parseFloat(targetPrice),
-      quantity:    parseInt(quantity),
+      targetPrice: price,
+      quantity:    qty,
     });
 
-    res.json({ success: true, message: `${orderType.toUpperCase()} order placed for ${stockname}`, order });
+    res.json({ success: true, message: `${orderType.toUpperCase()} order placed for ${sym}`, order });
 
   } catch (e: any) {
     res.status(500).json({ success: false, message: e.message });

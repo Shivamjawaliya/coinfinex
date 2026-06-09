@@ -42,4 +42,18 @@ passport.use(
   )
 );
 
+// ── Add these ────────────────────────────────────
+passport.serializeUser((user: any, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user as unknown as Express.User);
+  } catch (err) {
+    done(err, null);
+  }
+});
+
 export default passport;

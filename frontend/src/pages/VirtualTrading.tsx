@@ -174,7 +174,7 @@ export default function VirtualTrading() {
   const confirmSell = async () => {
     if (!selSym || !livePrice) return;
     try {
-      await sellStock(selSym, qty);
+      await sellStock(selSym, qty, livePrice);
       setShowModal(false);
       toast(`✓ Sold ${qty} × ${selSym}`, "success");
       load();
@@ -185,7 +185,8 @@ export default function VirtualTrading() {
   const confirmTableSell = async () => {
     if (!sellModal) return;
     try {
-      await sellStock(sellModal.stockname, sellQty);
+      const sellPrice = livePrices[sellModal.stockname] ?? sellModal.currentPrice;
+      await sellStock(sellModal.stockname, sellQty, sellPrice);
       setSellModal(null);
       toast(`✓ Sold ${sellQty} × ${sellModal.stockname}`, "success");
       load();

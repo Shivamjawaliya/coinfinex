@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import UserStocks from "../models/userStocksSchema";
+import Order from "../models/Order";
 import { yahooFinance } from "../utils/helpers";
 
 interface PortfolioItem {
@@ -122,11 +123,13 @@ export const buyStock = async (req: Request, res: Response): Promise<void> => {
       existing.stockquantity = totalQty;
       existing.stockbuyprice = avgPrice;
       await existing.save();
+      await Order.create({ userid, stockname, orderType: "buy", targetPrice: Number(newPrice), quantity: Number(newQty), status: "executed", executedAt: new Date(), executedPrice: Number(newPrice) });
       res.json({ success: true, message: "Stock updated successfully" });
       return;
     }
 
     await UserStocks.create({ userid, stockname, stockquantity, stockbuyprice });
+    await Order.create({ userid, stockname, orderType: "buy", targetPrice: Number(stockbuyprice), quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: Number(stockbuyprice) });
     res.json({ success: true, message: "Stock purchased successfully" });
   } catch (err) {
     console.error(err);
@@ -138,7 +141,7 @@ export const buyStock = async (req: Request, res: Response): Promise<void> => {
 export const sellStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const userid = req.user!.email as string;
-    const { stockname, stockquantity } = req.body as { stockname: string; stockquantity: number };
+    const { stockname, stockquantity, stocksellprice } = req.body as { stockname: string; stockquantity: number; stocksellprice?: number };
 
     const existing = await UserStocks.findOne({ userid, stockname });
     if (!existing) {
@@ -151,14 +154,18 @@ export const sellStock = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const sellPrice = stocksellprice ?? existing.stockbuyprice;
+
     if (Number(stockquantity) === existing.stockquantity) {
       await UserStocks.deleteOne({ userid, stockname });
+      await Order.create({ userid, stockname, orderType: "sell", targetPrice: sellPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
       res.json({ success: true, message: "Stock sold successfully" });
       return;
     }
 
     existing.stockquantity -= Number(stockquantity);
     await existing.save();
+    await Order.create({ userid, stockname, orderType: "sell", targetPrice: sellPrice, quantity: Number(stockquantity), status: "executed", executedAt: new Date(), executedPrice: sellPrice });
     res.json({ success: true, message: "Stock sold successfully" });
   } catch (err) {
     console.error(err);

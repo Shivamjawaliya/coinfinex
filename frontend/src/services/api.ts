@@ -35,8 +35,8 @@ export const getPortfolio = () => api.get("/portfolio");
 export const getTrading = () => api.get("/trading");
 export const buyStock = (stockname: string, stockquantity: number, stockbuyprice: number) =>
   api.post("/trading/buy", { stockname, stockquantity, stockbuyprice });
-export const sellStock = (stockname: string, stockquantity: number) =>
-  api.post("/trading/sell", { stockname, stockquantity });
+export const sellStock = (stockname: string, stockquantity: number, stocksellprice?: number) =>
+  api.post("/trading/sell", { stockname, stockquantity, stocksellprice });
 export const resetPortfolio = () => api.post("/trading/reset");
 
 // News
